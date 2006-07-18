@@ -1,0 +1,8 @@
+Installation instructions for vcard module:
+
+1) Install Contact_Vcard_Parse from PEAR:
+   $ pear install Contact_Vcard_Parse
+
+2) Enable vcard module on administer->modules
+
+3) Configure the profile field mappings on administer->settings->vcard
