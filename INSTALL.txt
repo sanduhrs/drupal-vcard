@@ -1,7 +1,7 @@
 Installation instructions for vcard module:
 
-1) Install Contact_Vcard_Parse from PEAR:
-   $ pear install Contact_Vcard_Parse
+1) Install Contact_Vcard_Build from PEAR:
+   $ pear install Contact_Vcard_Build
 
 2) Enable vcard module on administer->modules
 

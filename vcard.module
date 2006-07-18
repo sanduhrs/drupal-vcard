@@ -12,12 +12,18 @@ function vcard_help($section) {
 
 function vcard_menu($may_cache) {
   $items = array();
-  if (arg(0) == 'user' && is_numeric(arg(1))) {
-    $items[] = array('path' => 'user/'. arg(1) .'/vcard', 'title' => t('vcard'),
-                     'type' => MENU_CALLBACK,
-                     'callback' => 'vcard_fetch',
-                     'access' => user_access('access user profiles'));
+
+  if ($may_cache) {
+    if (arg(0) == 'user' && is_numeric(arg(1))) {
+      $items[] = array(
+        'path' => 'user/'. arg(1) .'/vcard',
+        'title' => t('vcard'),
+        'type' => MENU_CALLBACK,
+        'callback' => 'vcard_fetch',
+        'access' => user_access('access user profiles'));
+    }
   }
+
   return $items;
 }
 
@@ -27,22 +33,33 @@ function vcard_settings() {
   }
 
   if (module_exist('profile')) {
-    $options = array("" => "Select a property");  
+    $form['field_mappings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Field Mappings'),
+      '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
+    );
+    $options = array('' => 'Select a property');  
     $options = $options + _vcard_properties();
     foreach (_vcard_profile_fields() as $fid => $title) {
-      $mapping .= form_select(t("Property for ").$title, "vcard_profile_".$fid, variable_get("vcard_profile_".$fid,""),$options);
+      $form['field_mappings']['vcard_profile_'. $fid] = array(
+        '#type' => 'select',
+        '#title' => t('Property for ') . $title,
+        '#default_value' => variable_get('vcard_profile_'. $fid,""),
+        '#options' => $options,
+      );
     }
-    $output .= form_group(t("Field Mappings"), $mapping, t("This section is only enabled if the 'profiles' module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url"));
   }
 
-  return $output;
+  return $form;
 }
 
-function vcard_user($op, $edit, $account, $category = NULL) {
+function vcard_user($type, &$edit, &$user) {
   switch ($op) {
     case 'view':
-      $content .= theme('image', drupal_get_path('module','vcard') . '/vcard.png', t('download vcard')). ' '. l(t('download vcard'), 'user/'.$account->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE);
-      return array('' => $content);
+    $items[] = array(
+      'value' => theme('image', drupal_get_path('module','vcard') . '/vcard.png', t('download vcard')) .' '. l(t('download vcard'), 'user/'. $user->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
+    );
+    return array(t('vCard') => $items);
   }
 }
 
