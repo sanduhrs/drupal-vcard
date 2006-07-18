@@ -14,6 +14,12 @@ function vcard_menu($may_cache) {
   $items = array();
 
   if ($may_cache) {
+    $items[] = array(
+       'path' => 'admin/settings/vcard',
+       'title' => t('vCard'),
+       'callback' => 'vcard_admin_settings',
+       'access' => user_access('administer site configuration'),
+       'type' => MENU_NORMAL_ITEM);
     if (arg(0) == 'user' && is_numeric(arg(1))) {
       $items[] = array(
         'path' => 'user/'. arg(1) .'/vcard',
@@ -27,7 +33,7 @@ function vcard_menu($may_cache) {
   return $items;
 }
 
-function vcard_settings() {
+function vcard_admin_settings() {
   if (!_vcard_init()) {
     drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
   }
@@ -50,7 +56,7 @@ function vcard_settings() {
     }
   }
 
-  return $form;
+  return system_settings_form('vcard_admin_settings', $form);
 }
 
 function vcard_user($type, &$edit, &$user) {
