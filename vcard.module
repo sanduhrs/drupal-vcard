@@ -13,7 +13,7 @@ function vcard_help($section) {
 function vcard_menu($may_cache) {
   $items = array();
 
-  if ($may_cache) {
+  if (!$may_cache) {
     if (arg(0) == 'user' && is_numeric(arg(1))) {
       $items[] = array(
         'path' => 'user/'. arg(1) .'/vcard',
@@ -21,9 +21,9 @@ function vcard_menu($may_cache) {
         'type' => MENU_CALLBACK,
         'callback' => 'vcard_fetch',
         'access' => user_access('access user profiles'));
+      
     }
   }
-
   return $items;
 }
 
@@ -54,11 +54,10 @@ function vcard_settings() {
 }
 
 function vcard_user($type, &$edit, &$user) {
-  switch ($type) {
+  switch ($op) {
     case 'view':
     $items[] = array(
       'value' => theme('image', drupal_get_path('module','vcard') . '/vcard.png', t('download vcard')) .' '. l(t('download vcard'), 'user/'. $user->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
-      'class' => 'download',
     );
     return array(t('vCard') => $items);
   }
