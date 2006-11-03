@@ -20,6 +20,8 @@ function vcard_menu($may_cache) {
        'callback' => 'vcard_admin_settings',
        'access' => user_access('administer site configuration'),
        'type' => MENU_NORMAL_ITEM);
+  }
+  else {
     if (arg(0) == 'user' && is_numeric(arg(1))) {
       $items[] = array(
         'path' => 'user/'. arg(1) .'/vcard',
@@ -27,9 +29,9 @@ function vcard_menu($may_cache) {
         'type' => MENU_CALLBACK,
         'callback' => 'vcard_fetch',
         'access' => user_access('access user profiles'));
+      
     }
   }
-
   return $items;
 }
 
