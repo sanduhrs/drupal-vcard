@@ -54,7 +54,7 @@ function vcard_settings() {
 }
 
 function vcard_user($type, &$edit, &$user) {
-  switch ($op) {
+  switch ($type) {
     case 'view':
     $items[] = array(
       'value' => theme('image', drupal_get_path('module','vcard') . '/vcard.png', t('download vcard')) .' '. l(t('download vcard'), 'user/'. $user->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
