@@ -1,3 +1,5 @@
+// $Id$
+
 Installation instructions for vcard module:
 
 1) Install Contact_Vcard_Build from PEAR:

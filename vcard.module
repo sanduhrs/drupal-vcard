@@ -38,7 +38,21 @@ function vcard_requirements($phase) {
 function vcard_help($section) {
   switch ($section) {
     case 'admin/help#vcard':
-      return t('vCard automates the exchange of personal information typically found on a traditional business card. vCard is used in applications such as Internet mail, voice mail, Web browsers, telephony applications, call centers, video conferencing, PIMs (Personal Information Managers), PDAs (Personal Data Assistants), pagers, fax, office equipment, and smart cards. vCard information goes way beyond simple text, and includes elements like pictures, company logos, live Web addresses, and so on.');
+      return t("
+        <p>
+        vCard automates the exchange of personal information typically found on a traditional business card. vCard is used in applications such as Internet mail, voice mail, Web browsers, telephony applications, call centers, video conferencing, PIMs (Personal Information Managers), PDAs (Personal Data Assistants), pagers, fax, office equipment, and smart cards. vCard information goes way beyond simple text, and includes elements like pictures, company logos, live Web addresses, and so on.
+        </p>
+        <p>
+        Web browsers and !aggregation_tools can also extract and use vCard-like information when it is displayed on the page using !hcard - an embedded !microformat. 
+        Read the module's documentation for more information on how to add hCard support to your theme.
+        </p>
+        <pre>", 
+        array(
+          '!aggregation_tools' => l('aggregation tools', 'https://addons.mozilla.org/en-US/firefox/addon/2240'),
+          '!hcard' => l('hCard', 'http://microformats.org/wiki/hcard'),
+          '!microformat' => l('microformat', 'http://microformats.org'),
+        )
+      );
   }
 }
 
@@ -102,14 +116,17 @@ function vcard_admin_settings() {
 
 /**
  * Implementation of hook_user().
+ * Adds a vcard icon and link to the user page
  */
 function vcard_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'view':
-    $items[] = array(
-      'value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
-    );
-    return array(t('vCard') => $items);
+    if (_vcard_init()) {
+      $items[] = array(
+        'value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
+      );
+      return array(t('vCard') => $items);
+    }
   }
 }
 
@@ -145,7 +162,7 @@ function vcard_fetch() {
     }
   }
   
-// organization
+  // Organization
   $org = vcard_get_field('organization', $account);
   if (!empty($org)) {
     $vcard->addOrganization($org);
@@ -183,10 +200,15 @@ function vcard_fetch() {
 }
 
 /**
- * outputs a nice vcard for the user
+ * Displays user contact information decorated with hCard microformats.
+ * 
+ * Use this in your theme to replace theme_user_profile() or
+ * theme_profile_listing()
  *
- * uses hCard as the default xHTML
+ * Uses hCard as the default xHTML
  * see http://microformats.org/wiki/hcard
+ * 
+ * @param $account user object
  */
 function theme_vcard($account) {
   // photo
@@ -261,7 +283,10 @@ function vcard_get_field($field, $account) {
 }
 
 /**
- * Initiate a new vcard 
+ * Ensures the vcard PEAR library is available and returns the vCard builder
+ * object.
+ * 
+ * @return vCard object, null if library is not available.
  */
 function _vcard_init() {
   if (@include_once('Contact_Vcard_Build.php')) {

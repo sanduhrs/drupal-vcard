@@ -1,4 +1,4 @@
-; $Id $
+; $Id$
 name = "vCard"
 description = "Allows vcard export of user data"
 dependencies = profile
