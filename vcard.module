@@ -1,10 +1,29 @@
 <?php
 // $Id$
 
+/**
+ * Implementation of hook_requirements().
+ */
+function vcard_requirements($phase) {
+  $requirement = array();
+  // Ensure translations don't break at install time
+  $t = get_t();
+  $init = _vcard_init(); 
+
+  if ($phase == 'runtime') {
+    $requirement['vcard'] = array(
+      'title' => t('PEAR Contact_Vcard_Build'),
+      'value' => $init ? t('Available.') : t('Not available.'),
+      'description' => t(l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build') .' for vcard generation.'),
+      'severity' => $init ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+    );
+  }
+
+  return $requirement;
+}
+
 function vcard_help($section) {
   switch ($section) {
-    case 'admin/settings/modules#description':
-      return t('Allows vcard export of user data');
     case 'admin/help#vcard':
       return t('vCard automates the exchange of personal information typically found on a traditional business card. vCard is used in applications such as Internet mail, voice mail, Web browsers, telephony applications, call centers, video conferencing, PIMs (Personal Information Managers), PDAs (Personal Data Assistants), pagers, fax, office equipment, and smart cards. vCard information goes way beyond simple text, and includes elements like pictures, company logos, live Web addresses, and so on.');
   }
@@ -15,13 +34,14 @@ function vcard_menu($may_cache) {
 
   if ($may_cache) {
     $items[] = array(
-       'path' => 'admin/settings/vcard',
-       'title' => t('vCard'),
-       'callback' => 'drupal_get_form',
-       'callback arguments' => 'vcard_admin_settings',
-       'description' => 'Configure the profile field mappings.',
-       'access' => user_access('administer site configuration'),
-       'type' => MENU_NORMAL_ITEM);
+      'path' => 'admin/settings/vcard',
+      'title' => t('vCard'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => 'vcard_admin_settings',
+      'description' => 'Configure the profile field mapuserpings.',
+      'access' => user_access('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+    );
   }
   else {
     if (arg(0) == 'user' && is_numeric(arg(1))) {
@@ -30,8 +50,8 @@ function vcard_menu($may_cache) {
         'title' => t('vcard'),
         'type' => MENU_CALLBACK,
         'callback' => 'vcard_fetch',
-        'access' => user_access('access user profiles'));
-      
+        'access' => user_access('access user profiles'),
+      );
     }
   }
   return $items;
@@ -53,7 +73,7 @@ function vcard_admin_settings() {
     $form['field_mappings']['vcard_profile_'. $fid] = array(
       '#type' => 'select',
       '#title' => t('Property for ') . $title,
-      '#default_value' => variable_get('vcard_profile_'. $fid,""),
+      '#default_value' => variable_get('vcard_profile_'. $fid, ''),
       '#options' => $options,
     );
   }
@@ -61,11 +81,11 @@ function vcard_admin_settings() {
   return system_settings_form($form);
 }
 
-function vcard_user($type, &$edit, &$user) {
-  switch ($type) {
+function vcard_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
     case 'view':
     $items[] = array(
-      'value' => theme('image', drupal_get_path('module','vcard') . '/vcard.png', t('download vcard')) .' '. l(t('download vcard'), 'user/'. $user->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
+      'value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
     );
     return array(t('vCard') => $items);
   }
@@ -78,16 +98,16 @@ function vcard_fetch() {
   $first = vcard_get_field('givenname', $account);
   $last = vcard_get_field('familyname', $account);
   if (!empty($first) && !empty($last)) {
-      $vcard->setName($last, $first,'','','');
+      $vcard->setName($last, $first, '', '', '');
       $vcard->setFormattedName($first .' '. $last);
   }
   else {
-      $vcard->setName($account->name, '','', '', '');
+      $vcard->setName($account->name, '', '', '', '');
       $vcard->setFormattedname($account->name);
   }
   $vcard->addEmail($account->mail);
   $vcard->addNickname($account->name);
-
+  
   // Birthday
   $birthday = vcard_get_field('birthday', $account);
   if (!empty($birthday)) {
@@ -128,12 +148,11 @@ function vcard_fetch() {
   $vcard->addAddress('', '', $street, $city, $province, $postal, $country);
 
   if ($account->location['latitude'] && $account->location['longitude']) {
-    $vcard->setGeo($account->location['latitude'],
-                   $account->location['longitude']);
+    $vcard->setGeo($account->location['latitude'], $account->location['longitude']);
   }
 
   header('Content-type: text/x-vcard');
-  header('Content-Disposition: attachment; filename="'.$account->name.'.vcf"');    
+  header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');    
   print $vcard->fetch();
   exit;
 }
@@ -153,7 +172,7 @@ function theme_vcard($account) {
       $picture = variable_get('user_picture_default', '');
     }
     if ($picture) {
-      $photo = '<img class="photo" src="'.$picture.'" alt="photo" />';
+      $photo = '<img class="photo" src="'. $picture .'" alt="photo" />';
     }
   }
 
@@ -162,37 +181,37 @@ function theme_vcard($account) {
   $lastname = vcard_get_field('familyname', $account);
   if ($firstname && $lastname) {
     $name = '<div class="n">';
-    $name.= '<span class="given-name">'. $firstname ."</span>\n";
-    $name.= '<span class="family-name">'. $lastname . "</span>\n";
-    $name.= '<span class="nickname">'. $account->name . "</span>\n";
-    $name.= "</div>\n";
+    $name .= '<span class="given-name">'. $firstname ."</span>\n";
+    $name .= '<span class="family-name">'. $lastname ."</span>\n";
+    $name .= '<span class="nickname">'. $account->name ."</span>\n";
+    $name .= "</div>\n";
   }
   else {
-    $name = '<div class="fn">'. $account->name . "</div>\n";
+    $name = '<div class="fn">'. $account->name ."</div>\n";
   }
 
-  $street = vcard_get_field('street', $account);
-  $city = vcard_get_field('city', $account);
+  $street   = vcard_get_field('street', $account);
+  $city     = vcard_get_field('city', $account);
   $province = vcard_get_field('province', $account);
-  $postal = vcard_get_field('postal', $account);
-  $country = vcard_get_field('country', $account);
+  $postal   = vcard_get_field('postal', $account);
+  $country  = vcard_get_field('country', $account);
 
   if ($street || $city || $province || $postal || $country ) {
     $address = '<div class="adr">';
-    $address.= ($street) ? '<div class="street-address">'.$street."</div>\n" : '';
-    $address.= ($city) ? '<span class="locality">'. $city ."</div>\n" : '';
-    $address.= ($province) ? '<span class="region">'. $province ."</span>\n" : '';
-    $address.= ($postal) ? '<span class="postal-code">'. $postal ."</span>\n" : '';
-    $address.= ($country) ? '<span class="country-name">'. $country ."</span>\n" : '';
-    $address.=  "</div>\n";
+    $address .= ($street) ? '<div class="street-address">'. $street ."</div>\n" : '';
+    $address .= ($city) ? '<span class="locality">'. $city ."</div>\n" : '';
+    $address .= ($province) ? '<span class="region">'. $province ."</span>\n" : '';
+    $address .= ($postal) ? '<span class="postal-code">'. $postal ."</span>\n" : '';
+    $address .= ($country) ? '<span class="country-name">'. $country ."</span>\n" : '';
+    $address .=  "</div>\n";
   }
 
   if ($telephone = vcard_get_field('telephone', $account)) {
-    $tel = '<div class="tel">'.$telephone."</div>\n";
+    $tel = '<div class="tel">'. $telephone ."</div>\n";
   }
 
   if ($org = vcard_get_field('org', $account)) {
-    $org = '<div class="org">'.$org."</div>\n";
+    $org = '<div class="org">'. $org ."</div>\n";
   }
   
   $output .= '<div class="vcard">';
@@ -214,20 +233,19 @@ function vcard_get_field($field, $account) {
 
 
 function _vcard_init() {
-  require_once 'Contact_Vcard_Build.php';
-
-  $vcard = new Contact_Vcard_Build();
-  return $vcard;
+  if (@include_once('Contact_Vcard_Build.php')) {
+    $vcard = new Contact_Vcard_Build();
+  }
+  return $vcard ? $vcard : FALSE;
 }
 
 function _vcard_profile_fields() {
-  $output = array();  
+  $output = array();
   $result = db_query("SELECT fid, title FROM {profile_fields}");
   while ($row = db_fetch_object($result)) {
     $output[$row->fid] = $row->title;
   }
   return $output;
-
 }
 
 function _vcard_properties() {
@@ -246,7 +264,6 @@ function _vcard_properties() {
   );
 }
 
-
 function _vcard_get_map($account) {
   $map = array();
   $result = db_query('SELECT fid, name FROM {profile_fields}');
@@ -256,7 +273,6 @@ function _vcard_get_map($account) {
       $map[$mapped] = $account->{$field->name};
     }
   }
-  
-  
+   
   return $map;
 }
