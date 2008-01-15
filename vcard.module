@@ -107,13 +107,15 @@ function vcard_fetch() {
   }
 
   // URL
-  if (!empty($vcard_map['url'])) {
-    $vcard->setURL($vcard_map['url']);
+  $url = vcard_get_field('url', $account);
+  if (!empty($url)) {
+    $vcard->setURL($url);
   }
 
   // Telephone
-  if (!empty($vcard_map['telephone'])) {
-    $vcard->setURL($vcard_map['telephone']);
+  $tel = vcard_get_field('telephone', $account);
+  if (!empty($tel)) {
+    $vcard->addTelephone($tel);
   }
   
   // Address
