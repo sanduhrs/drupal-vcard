@@ -223,12 +223,19 @@ function _vcard_profile_fields() {
 }
 
 function _vcard_properties() {
-  return array('givenname' => t('Given Name'),
-               'familyname' => t('Family name'),
-               'birthday' => t('Birthday'),
-               'organization' => t('Organization'),
-               'telephone' => t('Telephone'),
-               'url' => t('URL'));
+  return array(
+    'givenname'     => t('Given Name'),
+    'familyname'    => t('Family name'),
+    'birthday'      => t('Birthday'),
+    'organization'  => t('Organization'),
+    'telephone'     => t('Telephone'),
+    'url'           => t('URL'),
+    'street'        => t('Street'),
+    'city'          => t('City'),
+    'postal'        => t('Postal'),
+    'province'      => t('Province'),
+    'country'       => t('Country'),
+  );
 }
 
 function _vcard_get_map($account) {
