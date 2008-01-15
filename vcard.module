@@ -258,7 +258,7 @@ function theme_vcard($account) {
     $tel = '<div class="tel">'. $telephone ."</div>\n";
   }
 
-  if ($org = vcard_get_field('org', $account)) {
+  if ($org = vcard_get_field('organization', $account)) {
     $org = '<div class="org">'. $org ."</div>\n";
   }
 
