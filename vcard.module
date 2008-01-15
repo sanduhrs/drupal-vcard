@@ -2,13 +2,13 @@
 // $Id$
 
 /**
- * vCard is a file format standard for electronic business cards. 
- * vCards are often attached to e-mail messages, but can be exchanged in other ways, 
+ * vCard is a file format standard for electronic business cards.
+ * vCards are often attached to e-mail messages, but can be exchanged in other ways,
  * such as on the World Wide Web. (http://en.wikipedia.org/wiki/Vcard)
- * 
+ *
  * This module creates downloadable vCards based on profile fields.
  * It is possible to output hCards (http://en.wikipedia.org/wiki/Hcard)
- * on a user's profile page via themeable function.  
+ * on a user's profile page via themeable function.
  */
 
 /**
@@ -18,7 +18,7 @@ function vcard_requirements($phase) {
   $requirement = array();
   // Ensure translations don't break at install time
   $t = get_t();
-  $init = _vcard_init(); 
+  $init = _vcard_init();
 
   if ($phase == 'runtime') {
     $requirement['vcard'] = array(
@@ -43,10 +43,10 @@ function vcard_help($section) {
         vCard automates the exchange of personal information typically found on a traditional business card. vCard is used in applications such as Internet mail, voice mail, Web browsers, telephony applications, call centers, video conferencing, PIMs (Personal Information Managers), PDAs (Personal Data Assistants), pagers, fax, office equipment, and smart cards. vCard information goes way beyond simple text, and includes elements like pictures, company logos, live Web addresses, and so on.
         </p>
         <p>
-        Web browsers and !aggregation_tools can also extract and use vCard-like information when it is displayed on the page using !hcard - an embedded !microformat. 
+        Web browsers and !aggregation_tools can also extract and use vCard-like information when it is displayed on the page using !hcard - an embedded !microformat.
         Read the module's documentation for more information on how to add hCard support to your theme.
         </p>
-        <pre>", 
+        <pre>",
         array(
           '!aggregation_tools' => l('aggregation tools', 'https://addons.mozilla.org/en-US/firefox/addon/2240'),
           '!hcard' => l('hCard', 'http://microformats.org/wiki/hcard'),
@@ -100,7 +100,7 @@ function vcard_admin_settings() {
     '#title' => t('Field Mappings'),
     '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
   );
-  $options = array('' => 'Select a property');  
+  $options = array('' => 'Select a property');
   $options = $options + _vcard_properties();
   foreach (_vcard_profile_fields() as $fid => $title) {
     $form['field_mappings']['vcard_profile_'. $fid] = array(
@@ -131,7 +131,7 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
- * VCard for direct download 
+ * VCard for direct download
  */
 function vcard_fetch() {
   $account = user_load(array('uid' => arg(1)));
@@ -149,7 +149,7 @@ function vcard_fetch() {
   }
   $vcard->addEmail($account->mail);
   $vcard->addNickname($account->name);
-  
+
   // Birthday
   $birthday = vcard_get_field('birthday', $account);
   if (!empty($birthday)) {
@@ -161,7 +161,7 @@ function vcard_fetch() {
       $vcard->setBirthday($bday);
     }
   }
-  
+
   // Organization
   $org = vcard_get_field('organization', $account);
   if (!empty($org)) {
@@ -179,14 +179,14 @@ function vcard_fetch() {
   if (!empty($tel)) {
     $vcard->addTelephone($tel);
   }
-  
+
   // Address
   $street = vcard_get_field('street', $account);
   $city = vcard_get_field('city', $account);
   $province = vcard_get_field('province', $account);
   $postal = vcard_get_field('postal', $account);
   $country = vcard_get_field('country', $account);
-  
+
   $vcard->addAddress('', '', $street, $city, $province, $postal, $country);
 
   if ($account->location['latitude'] && $account->location['longitude']) {
@@ -194,20 +194,20 @@ function vcard_fetch() {
   }
 
   header('Content-type: text/x-vcard');
-  header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');    
+  header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');
   print $vcard->fetch();
   exit;
 }
 
 /**
  * Displays user contact information decorated with hCard microformats.
- * 
+ *
  * Use this in your theme to replace theme_user_profile() or
  * theme_profile_listing()
  *
  * Uses hCard as the default xHTML
  * see http://microformats.org/wiki/hcard
- * 
+ *
  * @param $account user object
  */
 function theme_vcard($account) {
@@ -258,10 +258,10 @@ function theme_vcard($account) {
     $tel = '<div class="tel">'. $telephone ."</div>\n";
   }
 
-  if ($org = vcard_get_field('org', $account)) {
+  if ($org = vcard_get_field('organization', $account)) {
     $org = '<div class="org">'. $org ."</div>\n";
   }
-  
+
   $output .= '<div class="vcard">';
   $output .= $photo;
   $output .= $name;
@@ -274,7 +274,7 @@ function theme_vcard($account) {
 }
 
 /**
- * 
+ *
  */
 function vcard_get_field($field, $account) {
   $vcard_map = _vcard_get_map($account);
@@ -285,7 +285,7 @@ function vcard_get_field($field, $account) {
 /**
  * Ensures the vcard PEAR library is available and returns the vCard builder
  * object.
- * 
+ *
  * @return vCard object, null if library is not available.
  */
 function _vcard_init() {
@@ -296,7 +296,7 @@ function _vcard_init() {
 }
 
 /**
- * 
+ *
  */
 function _vcard_profile_fields() {
   $output = array();
@@ -308,7 +308,7 @@ function _vcard_profile_fields() {
 }
 
 /**
- * 
+ *
  */
 function _vcard_properties() {
   return array(
@@ -327,7 +327,7 @@ function _vcard_properties() {
 }
 
 /**
- * 
+ *
  */
 function _vcard_get_map($account) {
   $map = array();
@@ -338,6 +338,6 @@ function _vcard_get_map($account) {
       $map[$mapped] = $account->{$field->name};
     }
   }
-   
+
   return $map;
 }
