@@ -17,7 +17,9 @@ function vcard_menu($may_cache) {
     $items[] = array(
        'path' => 'admin/settings/vcard',
        'title' => t('vCard'),
-       'callback' => 'vcard_admin_settings',
+       'callback' => 'drupal_get_form',
+       'callback arguments' => 'vcard_admin_settings',
+       'description' => 'Configure the profile field mappings.',
        'access' => user_access('administer site configuration'),
        'type' => MENU_NORMAL_ITEM);
   }
@@ -40,25 +42,23 @@ function vcard_admin_settings() {
     drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
   }
 
-  if (module_exist('profile')) {
-    $form['field_mappings'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Field Mappings'),
-      '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
+  $form['field_mappings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field Mappings'),
+    '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
+  );
+  $options = array('' => 'Select a property');  
+  $options = $options + _vcard_properties();
+  foreach (_vcard_profile_fields() as $fid => $title) {
+    $form['field_mappings']['vcard_profile_'. $fid] = array(
+      '#type' => 'select',
+      '#title' => t('Property for ') . $title,
+      '#default_value' => variable_get('vcard_profile_'. $fid,""),
+      '#options' => $options,
     );
-    $options = array('' => 'Select a property');  
-    $options = $options + _vcard_properties();
-    foreach (_vcard_profile_fields() as $fid => $title) {
-      $form['field_mappings']['vcard_profile_'. $fid] = array(
-        '#type' => 'select',
-        '#title' => t('Property for ') . $title,
-        '#default_value' => variable_get('vcard_profile_'. $fid,""),
-        '#options' => $options,
-      );
-    }
   }
 
-  return system_settings_form('vcard_admin_settings', $form);
+  return system_settings_form($form);
 }
 
 function vcard_user($type, &$edit, &$user) {
