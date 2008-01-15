@@ -3,8 +3,6 @@
 
 function vcard_help($section) {
   switch ($section) {
-    case 'admin/settings/modules#description':
-      return t('Allows vcard export of user data');
     case 'admin/help#vcard':
       return t('vCard automates the exchange of personal information typically found on a traditional business card. vCard is used in applications such as Internet mail, voice mail, Web browsers, telephony applications, call centers, video conferencing, PIMs (Personal Information Managers), PDAs (Personal Data Assistants), pagers, fax, office equipment, and smart cards. vCard information goes way beyond simple text, and includes elements like pictures, company logos, live Web addresses, and so on.');
   }
