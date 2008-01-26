@@ -247,7 +247,7 @@ function theme_vcard($account) {
   if ($street || $city || $province || $postal || $country ) {
     $address = '<div class="adr">';
     $address .= ($street) ? '<div class="street-address">'. $street ."</div>\n" : '';
-    $address .= ($city) ? '<span class="locality">'. $city ."</div>\n" : '';
+    $address .= ($city) ? '<span class="locality">'. $city ."</span>\n" : '';
     $address .= ($province) ? '<span class="region">'. $province ."</span>\n" : '';
     $address .= ($postal) ? '<span class="postal-code">'. $postal ."</span>\n" : '';
     $address .= ($country) ? '<span class="country-name">'. $country ."</span>\n" : '';
