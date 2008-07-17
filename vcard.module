@@ -35,8 +35,8 @@ function vcard_requirements($phase) {
 /**
  * Implementation of hook_help().
  */
-function vcard_help($section) {
-  switch ($section) {
+function vcard_help($path, $arg) {
+  switch ($path) {
     case 'admin/help#vcard':
       return t("
         <p>
@@ -50,68 +50,46 @@ function vcard_help($section) {
         array(
           '!aggregation_tools' => l('aggregation tools', 'https://addons.mozilla.org/en-US/firefox/addon/2240'),
           '!hcard' => l('hCard', 'http://microformats.org/wiki/hcard'),
-          '!microformat' => l('microformat', 'http://microformats.org'),
+          '!microformat' => l('microformat', 'http://microformats.org'),hook
         )
       );
   }
 }
 
 /**
- * Implementation of hook_menu().
+ * Implementation of hook_perm().
+ *
+ * @return an array of permissions
  */
-function vcard_menu($may_cache) {
-  $items = array();
-
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/settings/vcard',
-      'title' => t('vCard'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => 'vcard_admin_settings',
-      'description' => 'Configure the profile field mapuserpings.',
-      'access' => user_access('administer site configuration'),
-      'type' => MENU_NORMAL_ITEM,
-    );
-  }
-  else {
-    if (arg(0) == 'user' && is_numeric(arg(1))) {
-      $items[] = array(
-        'path' => 'user/'. arg(1) .'/vcard',
-        'title' => t('vcard'),
-        'type' => MENU_CALLBACK,
-        'callback' => 'vcard_fetch',
-        'access' => user_access('access user profiles'),
-      );
-    }
-  }
-  return $items;
+function vcard_perm() {
+  return array('administer vcard', 'have vcard', 'download vcard');
 }
 
 /**
- * Callback for administration page.
+ * Implementation of hook_menu().
+ *
+ * @return an array of menu items
  */
-function vcard_admin_settings() {
-  if (!_vcard_init()) {
-    drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
-  }
+function vcard_menu() {
+  $items = array();
 
-  $form['field_mappings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Field Mappings'),
-    '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
+    $items['admin/settings/vcard'] = array(
+    'title' => 'vCard',
+    'description' => "Configure the profile field mapuserpings.",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcard_admin_settings'),
+    'access arguments' => array('administer vcard'),
+    'file' => 'vcard.admin.inc',
   );
-  $options = array('' => 'Select a property');
-  $options = $options + _vcard_properties();
-  foreach (_vcard_profile_fields() as $fid => $title) {
-    $form['field_mappings']['vcard_profile_'. $fid] = array(
-      '#type' => 'select',
-      '#title' => t('Property for ') . $title,
-      '#default_value' => variable_get('vcard_profile_'. $fid, ''),
-      '#options' => $options,
-    );
-  }
+  $items['user/%/vcard'] = array(
+    'title' => t('vcard'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'vcard_fetch',
+    'page arguments' => array(1),
+    'access arguments' => array('download vcard'),
+  );
 
-  return system_settings_form($form);
+  return $items;
 }
 
 /**
@@ -119,13 +97,21 @@ function vcard_admin_settings() {
  * Adds a vcard icon and link to the user page
  */
 function vcard_user($op, &$edit, &$account, $category = NULL) {
+  global $user;
+  
   switch ($op) {
     case 'view':
-    if (_vcard_init()) {
-      $items[] = array(
-        'value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', NULL, NULL, NULL, FALSE, TRUE),
+    // Check permissions
+    if ((user_access('have vcard', $account) && (user_access('download vcard') OR $user->uid === $account->uid)) && _vcard_init()) {
+      
+      // Attach vCard to profile
+      $account->content['vcard'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('vCard'),
+        '#value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', array('absolute' => FALSE, 'html' => TRUE)),
+        '#weight' => 10,
+        '#attributes' => array('class' => 'vcard-link'),
       );
-      return array(t('vCard') => $items);
     }
   }
 }
@@ -133,8 +119,8 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
 /**
  * VCard for direct download
  */
-function vcard_fetch() {
-  $account = user_load(array('uid' => arg(1)));
+function vcard_fetch($uid) {
+  $account = user_load(array('uid' => $uid));
   $vcard = _vcard_init();
 
   $first = vcard_get_field('givenname', $account);
@@ -274,12 +260,16 @@ function theme_vcard($account) {
 }
 
 /**
- *
+ * Map profile data to vcard fields
  */
 function vcard_get_field($field, $account) {
-  $vcard_map = _vcard_get_map($account);
-
-  return $vcard_map[$field];
+  static $vcard_map;
+  
+  if (empty($vcard_map[$account->uid])) {
+    $vcard_map[$account->uid] = _vcard_get_map($account);
+  }
+  
+  return $vcard_map[$account->uid][$field];
 }
 
 /**
@@ -293,18 +283,6 @@ function _vcard_init() {
     $vcard = new Contact_Vcard_Build();
   }
   return $vcard ? $vcard : FALSE;
-}
-
-/**
- *
- */
-function _vcard_profile_fields() {
-  $output = array();
-  $result = db_query("SELECT fid, title FROM {profile_fields}");
-  while ($row = db_fetch_object($result)) {
-    $output[$row->fid] = $row->title;
-  }
-  return $output;
 }
 
 /**

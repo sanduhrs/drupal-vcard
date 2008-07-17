@@ -1,5 +1,6 @@
 ; $Id$
-name = "vCard"
+name = vCard
 description = "Allows vcard export of user data"
-dependencies = profile
-; package =
+dependencies[] = profile
+;package = 
+core = 6.x
