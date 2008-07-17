@@ -57,6 +57,15 @@ function vcard_help($section) {
 }
 
 /**
+ * Implementation of hook_perm().
+ *
+ * @return an array of permissions
+ */
+function vcard_perm() {
+  return array('administer vcard', 'have vcard', 'download vcard', 'download vcard with e-mail');
+}
+
+/**
  * Implementation of hook_menu().
  */
 function vcard_menu($may_cache) {
@@ -80,7 +89,7 @@ function vcard_menu($may_cache) {
         'title' => t('vcard'),
         'type' => MENU_CALLBACK,
         'callback' => 'vcard_fetch',
-        'access' => user_access('access user profiles'),
+        'access' => user_access('download vcard') ? TRUE : (user_access('download vcard with e-mail') ? TRUE : FALSE),
       );
     }
   }
@@ -147,7 +156,10 @@ function vcard_fetch() {
       $vcard->setName($account->name, '', '', '', '');
       $vcard->setFormattedname($account->name);
   }
-  $vcard->addEmail($account->mail);
+  
+  if (user_access('download vcard with e-mail')) {
+    $vcard->addEmail($account->mail);
+  }
   $vcard->addNickname($account->name);
 
   // Birthday

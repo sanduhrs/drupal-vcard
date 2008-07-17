@@ -1,0 +1,36 @@
+<?php
+/* $Id$ */
+
+/**
+ * vCard
+ */
+
+/**
+ * Update
+ */
+function vcard_update_1() {
+  $ret = array();
+  
+  $roles = user_roles(FALSE, 'access user profile');
+  foreach ($roles as $rid => $name) {
+    switch ($GLOBALS['db_type']) {
+      case 'pgsql':
+        break;
+  
+      case 'mysql':
+      case 'mysqli':
+        $permissions = db_result(db_query("SELECT perm FROM {permission} WHERE rid=%d", $rid));
+        $permissions .= ', have vcard, download vcard, download vcard with e-mail';
+        $sql = "UPDATE {permission} SET perm='%s' WHERE rid=%d";
+        $result = db_query($sql, $permissions, $rid);
+        $ret[] = array('success' => $result !== FALSE, 'query' => check_plain($sql));
+        break;
+    }
+  }
+  
+  drupal_set_message(t('Please check vcard permission settings on the !settingspage', array('!settingspage' => l(t('Access control page'), 'admin/user/access'))));
+  // Clear the cached pages and menus:
+  menu_rebuild();
+  
+  return $ret;
+}
