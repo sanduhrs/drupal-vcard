@@ -286,12 +286,16 @@ function theme_vcard($account) {
 }
 
 /**
- *
+ * Map profile data to vcard fields
  */
 function vcard_get_field($field, $account) {
-  $vcard_map = _vcard_get_map($account);
-
-  return $vcard_map[$field];
+  static $vcard_map;
+  
+  if (empty($vcard_map[$account->uid])) {
+    $vcard_map[$account->uid] = _vcard_get_map($account);
+  }
+  
+  return $vcard_map[$account->uid][$field];
 }
 
 /**
