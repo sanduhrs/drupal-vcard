@@ -62,7 +62,7 @@ function vcard_help($path, $arg) {
  * @return an array of permissions
  */
 function vcard_perm() {
-  return array('administer vcard', 'have vcard', 'download vcard');
+  return array('administer vcard', 'have vcard', 'download vcard', 'download vcard with e-mail');
 }
 
 /**
@@ -86,10 +86,23 @@ function vcard_menu() {
     'type' => MENU_CALLBACK,
     'page callback' => 'vcard_fetch',
     'page arguments' => array(1),
-    'access arguments' => array('download vcard'),
+    'access callback' => 'vcard_perm_check',
   );
 
   return $items;
+}
+
+/**
+ * Check download permissions
+ * Custom menu access callback
+ *
+ * @return boolean
+ */
+function vcard_perm_check() {
+  if (user_access('download vcard') OR user_access('download vcard with e-mail')) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -102,8 +115,7 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'view':
     // Check permissions
-    if ((user_access('have vcard', $account) && (user_access('download vcard') OR $user->uid === $account->uid)) && _vcard_init()) {
-      
+    if (user_access('have vcard', $account) && vcard_perm_check() && _vcard_init()) {
       // Attach vCard to profile
       $account->content['vcard'] = array(
         '#type' => 'user_profile_item',
@@ -133,7 +145,10 @@ function vcard_fetch($uid) {
       $vcard->setName($account->name, '', '', '', '');
       $vcard->setFormattedname($account->name);
   }
-  $vcard->addEmail($account->mail);
+  
+  if (user_access('download vcard with e-mail')) {
+    $vcard->addEmail($account->mail);
+  }
   $vcard->addNickname($account->name);
 
   // Birthday
