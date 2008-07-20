@@ -262,7 +262,7 @@ function _vcard_get_map($account) {
 }
 
 /**
- * implementation of hook_theme().
+ * Implementation of hook_theme().
  */
 function vcard_theme($existing, $type, $theme, $path) {
   return array(
