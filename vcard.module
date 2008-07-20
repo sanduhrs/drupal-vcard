@@ -201,6 +201,79 @@ function vcard_fetch($uid) {
 }
 
 /**
+ * Map profile data to vcard fields
+ */
+function vcard_get_field($field, $account) {
+  static $vcard_map;
+  
+  if (empty($vcard_map[$account->uid])) {
+    $vcard_map[$account->uid] = _vcard_get_map($account);
+  }
+  
+  return $vcard_map[$account->uid][$field];
+}
+
+/**
+ * Ensures the vcard PEAR library is available and returns the vCard builder
+ * object.
+ *
+ * @return vCard object, null if library is not available.
+ */
+function _vcard_init() {
+  if (@include_once('Contact_Vcard_Build.php')) {
+    $vcard = new Contact_Vcard_Build();
+  }
+  return $vcard ? $vcard : FALSE;
+}
+
+/**
+ *
+ */
+function _vcard_properties() {
+  return array(
+    'givenname'     => t('Given Name'),
+    'familyname'    => t('Family name'),
+    'birthday'      => t('Birthday'),
+    'organization'  => t('Organization'),
+    'telephone'     => t('Telephone'),
+    'url'           => t('URL'),
+    'street'        => t('Street'),
+    'city'          => t('City'),
+    'postal'        => t('Postal'),
+    'province'      => t('Province'),
+    'country'       => t('Country'),
+  );
+}
+
+/**
+ *
+ */
+function _vcard_get_map($account) {
+  $map = array();
+  $result = db_query('SELECT fid, name FROM {profile_fields}');
+  while ($field = db_fetch_object($result)) {
+    $mapped = variable_get('vcard_profile_'. $field->fid, 0);
+    if ($mapped) {
+      $map[$mapped] = $account->{$field->name};
+    }
+  }
+
+  return $map;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function vcard_theme($existing, $type, $theme, $path) {
+  return array(
+    'vcard' => array(
+      'arguments' => array('account' => NULL),
+    ),
+  );
+}
+
+
+/**
  * Displays user contact information decorated with hCard microformats.
  *
  * Use this in your theme to replace theme_user_profile() or
@@ -272,65 +345,4 @@ function theme_vcard($account) {
   $output .= '<br class="clear" />';
   $output .= "</div>\n";
   return $output;
-}
-
-/**
- * Map profile data to vcard fields
- */
-function vcard_get_field($field, $account) {
-  static $vcard_map;
-  
-  if (empty($vcard_map[$account->uid])) {
-    $vcard_map[$account->uid] = _vcard_get_map($account);
-  }
-  
-  return $vcard_map[$account->uid][$field];
-}
-
-/**
- * Ensures the vcard PEAR library is available and returns the vCard builder
- * object.
- *
- * @return vCard object, null if library is not available.
- */
-function _vcard_init() {
-  if (@include_once('Contact_Vcard_Build.php')) {
-    $vcard = new Contact_Vcard_Build();
-  }
-  return $vcard ? $vcard : FALSE;
-}
-
-/**
- *
- */
-function _vcard_properties() {
-  return array(
-    'givenname'     => t('Given Name'),
-    'familyname'    => t('Family name'),
-    'birthday'      => t('Birthday'),
-    'organization'  => t('Organization'),
-    'telephone'     => t('Telephone'),
-    'url'           => t('URL'),
-    'street'        => t('Street'),
-    'city'          => t('City'),
-    'postal'        => t('Postal'),
-    'province'      => t('Province'),
-    'country'       => t('Country'),
-  );
-}
-
-/**
- *
- */
-function _vcard_get_map($account) {
-  $map = array();
-  $result = db_query('SELECT fid, name FROM {profile_fields}');
-  while ($field = db_fetch_object($result)) {
-    $mapped = variable_get('vcard_profile_'. $field->fid, 0);
-    if ($mapped) {
-      $map[$mapped] = $account->{$field->name};
-    }
-  }
-
-  return $map;
 }
