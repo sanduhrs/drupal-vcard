@@ -9,7 +9,9 @@ Installation instructions for vcard module:
 
 3) Configure the profile field mappings on Administer->Site configuration->vCard (?q=admin/settings/vcard)
 
-4) To enable hCard support in your theme, you can invoke theme_vcard($user) directly.
+4) Configure the permissions on Administer->User management->Permissions (?q=admin/user/permissions)
+
+5) To enable hCard support in your theme, you can invoke theme_vcard($user) directly.
    eg, add the following to your theme template.php and your user page details will be formatted as a vcard.
 
    <?php
