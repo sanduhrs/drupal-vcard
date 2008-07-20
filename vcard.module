@@ -73,7 +73,7 @@ function vcard_perm() {
 function vcard_menu() {
   $items = array();
 
-    $items['admin/settings/vcard'] = array(
+  $items['admin/settings/vcard'] = array(
     'title' => 'vCard',
     'description' => "Configure the profile field mapuserpings.",
     'page callback' => 'drupal_get_form',
