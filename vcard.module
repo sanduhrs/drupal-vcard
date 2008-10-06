@@ -129,9 +129,9 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
- * VCard for direct download
+ * Retrieve a user's vcard
  */
-function vcard_fetch($uid) {
+function vcard_get($uid) {
   $account = user_load(array('uid' => $uid));
   $vcard = _vcard_init();
 
@@ -194,6 +194,14 @@ function vcard_fetch($uid) {
     $vcard->setGeo($account->location['latitude'], $account->location['longitude']);
   }
 
+  return $vcard;
+}
+
+/**
+ * VCard for direct download
+ */
+function vcard_fetch($uid) {
+  $vcard = vcard_get($uid);
   header('Content-type: text/x-vcard');
   header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');
   print $vcard->fetch();
@@ -346,3 +354,4 @@ function theme_vcard($account) {
   $output .= "</div>\n";
   return $output;
 }
+
