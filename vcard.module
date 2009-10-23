@@ -50,7 +50,7 @@ function vcard_help($path, $arg) {
         array(
           '!aggregation_tools' => l('aggregation tools', 'https://addons.mozilla.org/en-US/firefox/addon/2240'),
           '!hcard' => l('hCard', 'http://microformats.org/wiki/hcard'),
-          '!microformat' => l('microformat', 'http://microformats.org'),hook
+          '!microformat' => l('microformat', 'http://microformats.org'),
         )
       );
   }
