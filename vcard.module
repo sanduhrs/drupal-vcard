@@ -20,7 +20,7 @@ function vcard_requirements($phase) {
   $t = get_t();
   $init = _vcard_init();
 
-  if ($phase == 'runtime') {
+  if ($phase === 'runtime') {
     $requirement['vcard'] = array(
       'title' => t('PEAR Contact_Vcard_Build'),
       'value' => $init ? t('Available.') : t('Not available.'),
@@ -201,7 +201,7 @@ function vcard_fetch() {
 
   $vcard->addAddress('', '', $street, $city, $province, $postal, $country);
 
-  if ($account->location['latitude'] && $account->location['longitude']) {
+  if (!empty($account->location['latitude']) && !empty($account->location['longitude'])) {
     $vcard->setGeo($account->location['latitude'], $account->location['longitude']);
   }
 
@@ -302,7 +302,7 @@ function vcard_get_field($field, $account) {
   else {
     $vcard_map[$account->uid][$field] = check_plain($vcard_map[$account->uid][$field]);
   }
-  return $vcard_map[$account->uid][$field];
+  return isset($vcard_map[$account->uid][$field]) ? $vcard_map[$account->uid][$field] : '';
 }
 
 /**
