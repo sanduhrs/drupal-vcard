@@ -20,7 +20,7 @@ function vcard_requirements($phase) {
   $t = get_t();
   $init = _vcard_init();
 
-  if ($phase == 'runtime') {
+  if ($phase === 'runtime') {
     $requirement['vcard'] = array(
       'title' => t('PEAR Contact_Vcard_Build'),
       'value' => $init ? t('Available.') : t('Not available.'),
@@ -81,8 +81,8 @@ function vcard_menu() {
     'access arguments' => array('administer vcard'),
     'file' => 'vcard.admin.inc',
   );
-  $items['user/%/vcard'] = array(
-    'title' => t('vcard'),
+  $items['user/%user/vcard'] = array(
+    'title' => 'vcard',
     'type' => MENU_CALLBACK,
     'page callback' => 'vcard_fetch',
     'page arguments' => array(1),
@@ -131,7 +131,7 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
 /**
  * Retrieve a user's vcard
  */
-function vcard_get($uid) {
+function vcard_get($account) {
   $account = user_load(array('uid' => $uid));
   $vcard = _vcard_init();
 
@@ -190,7 +190,7 @@ function vcard_get($uid) {
 
   $vcard->addAddress('', '', $street, $city, $province, $postal, $country);
 
-  if ($account->location['latitude'] && $account->location['longitude']) {
+  if (!empty($account->location['latitude']) && !empty($account->location['longitude'])) {
     $vcard->setGeo($account->location['latitude'], $account->location['longitude']);
   }
 
@@ -200,8 +200,8 @@ function vcard_get($uid) {
 /**
  * VCard for direct download
  */
-function vcard_fetch($uid) {
-  $vcard = vcard_get($uid);
+function vcard_fetch($account) {
+  $vcard = vcard_get($account);
   header('Content-type: text/x-vcard');
   header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');
   print $vcard->fetch();
@@ -224,7 +224,7 @@ function vcard_get_field($field, $account) {
   else {
     $vcard_map[$account->uid][$field] = check_plain($vcard_map[$account->uid][$field]);
   }
-  return $vcard_map[$account->uid][$field];
+  return isset($vcard_map[$account->uid][$field]) ? $vcard_map[$account->uid][$field] : '';
 }
 
 /**
