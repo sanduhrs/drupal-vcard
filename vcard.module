@@ -203,7 +203,7 @@ function vcard_get($account) {
 function vcard_fetch($account) {
   $vcard = vcard_get($account);
   header('Content-type: text/x-vcard');
-  header('Content-Disposition: attachment; filename="'. $account->name .'.vcf"');
+  header('Content-Disposition: attachment; filename="'. uniqid() .'.vcf"');
   print $vcard->fetch();
   exit;
 }
