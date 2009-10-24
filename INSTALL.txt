@@ -18,12 +18,12 @@ Installation instructions for vcard module:
    /**
     * Override of theme_user_profile()
     */
-   function yourtheme_user_profile($account, $fields) {
+   function yourtheme_user_profile($account) {
      if (module_exists("vcard")) {
        return theme("vcard", $account);
      }
      else {
-       return theme_user_profile($account, $fields);
+       return drupal_render($account->content);
      }
    }
    ?>
