@@ -4,6 +4,9 @@ Installation instructions for vcard module:
 
 1) Install Contact_Vcard_Build from PEAR:
    $ pear install Contact_Vcard_Build
+   - OR - 
+   Install File_IMC from PEAR:
+   $ pear install File_IMC
 
 2) Enable vcard module on administer->modules
 
@@ -20,7 +23,7 @@ Installation instructions for vcard module:
     */
    function yourtheme_user_profile($account) {
      if (module_exists("vcard")) {
-       return theme("vcard", $account);
+       return theme('vcard', array('account' => $account)),
      }
      else {
        return drupal_render($account->content);
