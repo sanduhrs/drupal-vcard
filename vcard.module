@@ -129,7 +129,7 @@ function vcard_permission_check() {
  * 
  * Adds a vcard icon and link to the user page
  */
-function vcard_user_view(&$account) {
+function vcard_user_view($account, $view_mode, $langcode) {
   // Check permissions
   if (user_access('have vcard', $account) && vcard_permission_check() && _vcard_init()) {
     // Attach vCard to profile
