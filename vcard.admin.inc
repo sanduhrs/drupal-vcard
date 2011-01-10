@@ -11,7 +11,7 @@
  */
 function vcard_admin_settings() {
   if (!_vcard_init()) {
-    drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'warning');
+    drupal_set_message(t('The PEAR package File_IMC or Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
   }
 
   $options = array('' => t('<Select a property>'));
