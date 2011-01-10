@@ -271,7 +271,7 @@ function _vcard_init() {
   else if (@include_once('Contact_Vcard_Build.php')) {
     $vcard = new Contact_Vcard_Build();
   }
-  return isset($vcard) ? $vcard : FALSE;
+  return empty($vcard) ? FALSE : $vcard;
 }
 
 /**
