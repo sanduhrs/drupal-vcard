@@ -2,7 +2,9 @@
 // $Id$
 
 /**
+ * @file
  * vCard is a file format standard for electronic business cards.
+ *
  * vCards are often attached to e-mail messages, but can be exchanged in other ways,
  * such as on the World Wide Web. (http://en.wikipedia.org/wiki/Vcard)
  *
@@ -12,7 +14,7 @@
  */
 
 /**
- * Implementation of hook_requirements().
+ * Implement hook_requirements().
  */
 function vcard_requirements($phase) {
   $requirement = array();
@@ -22,9 +24,12 @@ function vcard_requirements($phase) {
 
   if ($phase === 'runtime') {
     $requirement['vcard'] = array(
-      'title' => t('PEAR Contact_Vcard_Build'),
+      'title' => t('PEAR File_IMC or Contact_Vcard_Build'),
       'value' => $init ? t('Available.') : t('Not available.'),
-      'description' => t(l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build') .' for vcard generation.'),
+      'description' => !$init ? t('Install !link1 or !link2 for vcard generation.', array(
+        '!link1' => l('PEAR File_IMC', 'http://pear.php.net/package/File_IMC'),
+        '!link2' => l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build'))
+      ) : '',
       'severity' => $init ? REQUIREMENT_OK : REQUIREMENT_ERROR,
     );
   }
@@ -33,7 +38,7 @@ function vcard_requirements($phase) {
 }
 
 /**
- * Implementation of hook_help().
+ * Implement hook_help().
  */
 function vcard_help($path, $arg) {
   switch ($path) {
@@ -57,7 +62,7 @@ function vcard_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implement hook_perm().
  *
  * @return an array of permissions
  */
@@ -66,7 +71,7 @@ function vcard_perm() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implement hook_menu().
  *
  * @return an array of menu items
  */
@@ -75,7 +80,7 @@ function vcard_menu() {
 
   $items['admin/settings/vcard'] = array(
     'title' => 'vCard',
-    'description' => "Configure the profile field mapuserpings.",
+    'description' => 'Configure the profile field mappings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('vcard_admin_settings'),
     'access arguments' => array('administer vcard'),
@@ -106,12 +111,11 @@ function vcard_perm_check() {
 }
 
 /**
- * Implementation of hook_user().
+ * Implement hook_user().
+ * 
  * Adds a vcard icon and link to the user page
  */
 function vcard_user($op, &$edit, &$account, $category = NULL) {
-  global $user;
-  
   switch ($op) {
     case 'view':
     // Check permissions
@@ -130,68 +134,92 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
 
 /**
  * Retrieve a user's vcard
+ *
+ * @return a vcard object structure with formatted values in the fields
  */
 function vcard_get($account) {
-  $account = user_load(array('uid' => $uid));
-  $vcard = _vcard_init();
+  $vcard_raw = vcard_get_raw($account);
 
-  $first = vcard_get_field('givenname', $account);
-  $last = vcard_get_field('familyname', $account);
-  if (!empty($first) && !empty($last)) {
-      $vcard->setName($last, $first, '', '', '');
-      $vcard->setFormattedName($first .' '. $last);
+  $vcard = _vcard_init();
+  $vcard->addParam('ENCODING', '8BIT');
+
+  if (isset($vcard_raw->picture->uri)) {
+    $filepath = file_create_url($vcard_raw->picture->uri);
+    $vcard->setPhoto($filepath); 
+    $vcard->addParam('VALUE', 'uri');
+    $vcard->addParam('ENCODING', '8BIT');
+  }
+
+  if (isset($vcard_raw->givenname) && isset($vcard_raw->familyname)) {
+    $givenname  = $vcard_raw->givenname;
+    $familyname = $vcard_raw->familyname;
+
+    $vcard->setName($familyname, $givenname, '', '', '');
+    $vcard->addParam('ENCODING', '8BIT');
+    $vcard->setFormattedName($givenname . ' ' . $familyname);
+    $vcard->addParam('ENCODING', '8BIT');
   }
   else {
-      $vcard->setName($account->name, '', '', '', '');
-      $vcard->setFormattedname($account->name);
+    $vcard->setName(check_plain($account->name), '', '', '', '');
+    $vcard->addParam('ENCODING', '8BIT');
+    $vcard->setFormattedname(check_plain($account->name));
+    $vcard->addParam('ENCODING', '8BIT');
   }
-  
-  if (user_access('download vcard with e-mail')) {
-    $vcard->addEmail($account->mail);
+
+  if (isset($vcard->mail)) {
+    $vcard->addEmail(check_plain($vcard->mail));
+    $vcard->addParam('ENCODING', '8BIT');
   }
-  $vcard->addNickname($account->name);
+  $vcard->addNickname(check_plain($account->name));
+  $vcard->addParam('ENCODING', '8BIT');
 
   // Birthday
-  $birthday = vcard_get_field('birthday', $account);
-  if (!empty($birthday)) {
+  if (isset($vcard_raw->birthday)) {
+    $birthday = $vcard_raw->birthday;
+
     if (is_array($birthday)) {
-      $bday = $birthday['year'] .'-'. $birthday['month'] .'-'. $birthday['day'];
+      $bday = $birthday['year'] . '-' . $birthday['month'] . '-' . $birthday['day'];
       $vcard->setBirthday($bday);
     }
     else {
-      $vcard->setBirthday($bday);
+      $vcard->setBirthday($birthday);
     }
   }
+  $vcard->addParam('ENCODING', '8BIT');
 
   // Organization
-  $org = vcard_get_field('organization', $account);
-  if (!empty($org)) {
-    $vcard->addOrganization($org);
+  if (isset($vcard_raw->organization)) {
+    $vcard->addOrganization($vcard_raw->organization);
+    $vcard->addParam('ENCODING', '8BIT');
   }
 
   // URL
-  $url = vcard_get_field('url', $account);
-  if (!empty($url)) {
-    $vcard->setURL($url);
+  if (isset($vcard_raw->url)) {
+    $vcard->setURL($vcard_raw->url);
+    $vcard->addParam('ENCODING', '8BIT');
   }
 
   // Telephone
-  $tel = vcard_get_field('telephone', $account);
-  if (!empty($tel)) {
-    $vcard->addTelephone($tel);
+  if (isset($vcard_raw->telephone)) {
+    $vcard->addTelephone($vcard_raw->telephone);
+    $vcard->addParam('ENCODING', '8BIT');
   }
 
   // Address
-  $street = vcard_get_field('street', $account);
-  $city = vcard_get_field('city', $account);
-  $province = vcard_get_field('province', $account);
-  $postal = vcard_get_field('postal', $account);
-  $country = vcard_get_field('country', $account);
-
+  $street   = isset($vcard_raw->street)   ? $vcard_raw->street   : '';
+  $city     = isset($vcard_raw->city)     ? $vcard_raw->city     : '';
+  $province = isset($vcard_raw->province) ? $vcard_raw->province : '';
+  $postal   = isset($vcard_raw->postal)   ? $vcard_raw->postal   : '';
+  $country  = isset($vcard_raw->country)  ? $vcard_raw->country  : '';
   $vcard->addAddress('', '', $street, $city, $province, $postal, $country);
+  $vcard->addParam('ENCODING', '8BIT');
 
-  if (!empty($account->location['latitude']) && !empty($account->location['longitude'])) {
-    $vcard->setGeo($account->location['latitude'], $account->location['longitude']);
+  // Geo coordinates
+  if (isset($vcard->location)) {
+    if (isset($vcard->location['latitude']) && isset($vcard->location['longitude'])) {
+      $vcard->setGeo($vcard->location['latitude'], $vcard->location['longitude']);
+      $vcard->addParam('ENCODING', '8BIT');
+    }
   }
 
   return $vcard;
@@ -199,32 +227,21 @@ function vcard_get($account) {
 
 /**
  * VCard for direct download
+ * 
+ * Prints to the browser for direct download, then exits
  */
 function vcard_fetch($account) {
   $vcard = vcard_get($account);
-  header('Content-type: text/x-vcard');
-  header('Content-Disposition: attachment; filename="'. uniqid() .'.vcf"');
-  print $vcard->fetch();
-  exit;
-}
-
-/**
- * Map profile data to vcard fields
- */
-function vcard_get_field($field, $account) {
-  static $vcard_map;
-  if (empty($vcard_map[$account->uid])) {
-    $vcard_map[$account->uid] = _vcard_get_map($account);
-  }
-  if (is_array($vcard_map[$account->uid][$field])) {
-    foreach ($vcard_map[$account->uid][$field] as $key => $value) {
-      $vcard_map[$account->uid][$field][$key] = check_plain($value);
-    }
+  $vcard_text = $vcard->fetch();
+  if (!empty($vcard_text)) {
+    header('Content-type: text/x-vcard');
+    header('Content-Disposition: attachment; filename="' . uniqid() . '.vcf"');
+    print $vcard_text;
+    exit;
   }
   else {
-    $vcard_map[$account->uid][$field] = check_plain($vcard_map[$account->uid][$field]);
+    return t("Error building vcard");
   }
-  return isset($vcard_map[$account->uid][$field]) ? $vcard_map[$account->uid][$field] : '';
 }
 
 /**
@@ -234,10 +251,13 @@ function vcard_get_field($field, $account) {
  * @return vCard object, null if library is not available.
  */
 function _vcard_init() {
-  if (@include_once('Contact_Vcard_Build.php')) {
+  if (@include_once('File/IMC.php')) {
+    $vcard =& File_IMC::build('vCard', '3.0');
+  }
+  else if (@include_once('Contact_Vcard_Build.php')) {
     $vcard = new Contact_Vcard_Build();
   }
-  return $vcard ? $vcard : FALSE;
+  return empty($vcard) ? FALSE : $vcard;
 }
 
 /**
@@ -260,18 +280,39 @@ function _vcard_properties() {
 }
 
 /**
- *
+ * Returns the list of field names => field labels available through
+ * profile.module
+ */
+function _vcard_profile_fields($value = 'name') {
+  $field_list = array();
+  // Use the profile.module internals to retrieve an enumeration of available fields.
+  // Avoid getting at the DB directly.
+  $categories = profile_categories();
+  foreach ($categories as $category_def) {
+    $field_lookup = array();
+    $result = _profile_get_fields($category_def['name']);
+    while ($field = db_fetch_object($result)) {
+      $field_lookup[] = $field;
+    }
+    foreach ($field_lookup as $field) {
+      $field_list[$field->name] = $field->title;
+    }
+  }
+  return $field_list;
+}
+
+/**
+ * Returns an array of profilefield-to-vcard attribute fieldnames
  */
 function _vcard_get_map($account) {
   $map = array();
-  $result = db_query('SELECT fid, name FROM {profile_fields}');
-  while ($field = db_fetch_object($result)) {
-    $mapped = variable_get('vcard_profile_'. $field->fid, 0);
+  $profile_fields = _vcard_profile_fields();
+  foreach ($profile_fields as $field_name => $field_label) {
+    $mapped = variable_get('vcard_profile_' . $field_name, 0);
     if ($mapped) {
-      $map[$mapped] = $account->{$field->name};
+      $map[$mapped] = $account->{$field_name};
     }
   }
-
   return $map;
 }
 
@@ -281,83 +322,90 @@ function _vcard_get_map($account) {
 function vcard_theme($existing, $type, $theme, $path) {
   return array(
     'vcard' => array(
-      'arguments' => array('account' => NULL),
+      'variables' => array('account' => NULL),
+      'template' => 'vcard',
     ),
   );
 }
 
-
 /**
- * Displays user contact information decorated with hCard microformats.
- *
- * Use this in your theme to replace theme_user_profile() or
- * theme_profile_listing()
- *
- * Uses hCard as the default xHTML
- * see http://microformats.org/wiki/hcard
- *
- * @param $account user object
+ * Return one vCard property
  */
-function theme_vcard($account) {
-  // photo
-  if (variable_get('user_pictures', 0)) {
-    if ($account->picture && file_exists($account->picture)) {
-      $picture = file_create_url($account->picture);
-    }
-    else if (variable_get('user_picture_default', '')) {
-      $picture = variable_get('user_picture_default', '');
-    }
-    if (!empty($picture)) {
-      $photo = '<img class="photo" src="'. $picture .'" alt="photo" />';
-    }
-  }
-
-  // name
-  $firstname = vcard_get_field('givenname', $account);
-  $lastname = vcard_get_field('familyname', $account);
-  if ($firstname && $lastname) {
-    $name = '<div class="n">';
-    $name .= '<span class="given-name">'. $firstname ."</span>\n";
-    $name .= '<span class="family-name">'. $lastname ."</span>\n";
-    $name .= '<span class="nickname">'. $account->name ."</span>\n";
-    $name .= "</div>\n";
-  }
-  else {
-    $name = '<div class="fn org summary">'. $account->name ."</div>\n";
-  }
-
-  $street   = vcard_get_field('street', $account);
-  $city     = vcard_get_field('city', $account);
-  $province = vcard_get_field('province', $account);
-  $postal   = vcard_get_field('postal', $account);
-  $country  = vcard_get_field('country', $account);
-
-  if ($street || $city || $province || $postal || $country ) {
-    $address = '<div class="adr">';
-    $address .= ($street) ? '<div class="street-address">'. $street ."</div>\n" : '';
-    $address .= ($city) ? '<span class="locality">'. $city ."</span>\n" : '';
-    $address .= ($province) ? '<span class="region">'. $province ."</span>\n" : '';
-    $address .= ($postal) ? '<span class="postal-code">'. $postal ."</span>\n" : '';
-    $address .= ($country) ? '<span class="country-name">'. $country ."</span>\n" : '';
-    $address .=  "</div>\n";
-  }
-
-  if ($telephone = vcard_get_field('telephone', $account)) {
-    $tel = '<div class="tel">'. $telephone ."</div>\n";
-  }
-
-  if ($org = vcard_get_field('organization', $account)) {
-    $org = '<div class="org">'. $org ."</div>\n";
-  }
-
-  $output  = '<div class="vcard">';
-  $output .= isset($photo) ? $photo : '';
-  $output .= $name;
-  $output .= $org;
-  $output .= $address;
-  $output .= $tel;
-  $output .= '<br class="clear" />';
-  $output .= "</div>\n";
-  return $output;
+function vcard_get_raw_field($field, $account) {
+  $vcard_raw = vcard_get_raw($account);
+  return isset($vcard_raw[$account->uid]->{$field}) ? $vcard_raw[$account->uid]->{$field} : NULL;
 }
 
+/**
+ * Assemble a raw vcard data structure
+ */
+function vcard_get_raw($account) {
+  static $vcard_raw = array();
+
+  if (empty($vcard_raw[$account->uid])) {
+    $vcard_raw[$account->uid] = (object) _vcard_get_map($account);
+    if ($account->picture) {
+      $vcard_raw[$account->uid]->picture = $account->picture;
+    }
+  
+    // Geolocation
+    // TODO: Test with Location module
+    if (isset($account->location) && $account->location['latitude'] && $account->location['longitude']) {
+      $vcard[$account->uid]->location['latitude']  = $account->location['latitude'];
+      $vcard[$account->uid]->location['longitude'] = $account->location['longitude'];
+    }
+  
+    if (user_access('download vcard with email')) {
+      $vcard_raw[$account->uid]->mail = $account->mail;
+    }
+  }
+
+  // Allow to alter the values
+  drupal_alter('vcard_data', $vcard_raw[$account->uid]);
+  return $vcard_raw[$account->uid];
+}
+
+/**
+ * Process variables for vcard.tpl.php.
+ *
+ * The $variables array contains the following arguments:
+ * - $account: A user object with 'name', 'uid' and 'picture' fields.
+ *
+ * @see vcard.tpl.php
+ */
+function template_preprocess_vcard(&$variables) {
+  $account = $variables['account'];
+  
+  $vcard_raw = vcard_get_raw($account);
+  foreach ($vcard_raw as $key => $value) {
+    // Sanitize data for possible html output
+    if (is_string($value)) {
+      $variables[$key] = $value;
+    }
+    elseif (is_array($value)) {
+      foreach ($value as $key => $val) {
+        $value[$key] = check_plain($val);
+      }
+    }
+    else {
+      // The only other thing  that should appear here is the user picture object,
+      // Which is taken from the user object and already is sanitized
+    }
+  }
+  
+  // Prepare user picture
+  $variables['user_picture'] = '';
+  if (!empty($vcard_raw->picture->uri)) {
+    $filepath = $vcard_raw->picture->uri;
+    $alt = t('Photo of @name', array('@name' => $account->name));
+    if (variable_get('user_pictures', FALSE)) {
+      $variables['user_picture'] = theme('image_style', array('style_name' => $style, 'path' => $filepath, 'alt' => $alt, 'title' => $alt, 'attributes' => array('class' => 'photo'), 'getsize' => FALSE));
+    }
+    else {
+      $variables['user_picture'] = theme('image', array('path' => $filepath, 'alt' => $alt, 'title' => $alt, 'attributes' => array('class' => 'photo'), 'getsize' => FALSE));
+    }
+  }
+
+  $variables['account'] = $account;
+  $variables['vcard']   = $vcard_raw;
+}

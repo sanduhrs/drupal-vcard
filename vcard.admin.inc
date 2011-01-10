@@ -2,7 +2,8 @@
 /* $Id$ */
 
 /**
- * vCard
+ * @file
+ * vCard - Administration UI
  */
 
 /**
@@ -10,36 +11,25 @@
  */
 function vcard_admin_settings() {
   if (!_vcard_init()) {
-    drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
+    drupal_set_message(t('The PEAR package File_IMC or Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'error');
   }
 
+  $options = array('' => t('<Select a property>'));
+  $options = $options + _vcard_properties();
+  $profile_fields = _vcard_profile_fields();
   $form['field_mappings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Field Mappings'),
-    '#description' => t('This section is only enabled if the "profiles" module is enabled. When enabled it will provide a dropdown selection box for each defined profile item of type textfield, textarea, or url.'),
+    '#description' => !count($profile_fields) ? t('You must first define a few profile fields before you can map them to vCard properties. To do this, go to the !link administration section.', array('!link' => l(t('Profiles'), 'admin/config/people/profile'))) : '',
   );
-  $options = array('' => 'Select a property');
-  $options = $options + _vcard_properties();
-  foreach (_vcard_profile_fields() as $fid => $title) {
-    $form['field_mappings']['vcard_profile_'. $fid] = array(
+  foreach ($profile_fields as $fid => $title) {
+    $form['field_mappings']['vcard_profile_' . $fid] = array(
       '#type' => 'select',
-      '#title' => t('Property for ') . $title,
-      '#default_value' => variable_get('vcard_profile_'. $fid, ''),
+      '#title' => t('Property for %title', array('%title' => $title)),
+      '#default_value' => variable_get('vcard_profile_' . $fid, ''),
       '#options' => $options,
     );
   }
 
   return system_settings_form($form);
-}
-
-/**
- *
- */
-function _vcard_profile_fields() {
-  $output = array();
-  $result = db_query("SELECT fid, title FROM {profile_fields}");
-  while ($row = db_fetch_object($result)) {
-    $output[$row->fid] = $row->title;
-  }
-  return $output;
 }
