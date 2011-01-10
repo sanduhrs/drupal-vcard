@@ -24,9 +24,12 @@ function vcard_requirements($phase) {
 
   if ($phase === 'runtime') {
     $requirement['vcard'] = array(
-      'title' => t('PEAR Contact_Vcard_Build'),
+      'title' => t('PEAR File_IMC or Contact_Vcard_Build'),
       'value' => $init ? t('Available.') : t('Not available.'),
-      'description' => t(l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build') . ' for vcard generation.'),
+      'description' => t('Install !link1 or !link2 for vcard generation.', array(
+        '!link1' => l('PEAR File_IMC', 'http://pear.php.net/package/File_IMC'),
+        '!link2' => l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build'))
+      ),
       'severity' => $init ? REQUIREMENT_OK : REQUIREMENT_ERROR,
     );
   }
@@ -262,7 +265,10 @@ function vcard_fetch($account) {
  * @return vCard object, null if library is not available.
  */
 function _vcard_init() {
-  if (@include_once('Contact_Vcard_Build.php')) {
+  if (@include_once('File/IMC.php')) {
+    $vcard =& File_IMC::build('vCard', '3.0');
+  }
+  else if (@include_once('Contact_Vcard_Build.php')) {
     $vcard = new Contact_Vcard_Build();
   }
   return isset($vcard) ? $vcard : FALSE;
