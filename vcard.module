@@ -307,7 +307,7 @@ function theme_vcard($account) {
     else if (variable_get('user_picture_default', '')) {
       $picture = variable_get('user_picture_default', '');
     }
-    if ($picture) {
+    if (!empty($picture)) {
       $photo = '<img class="photo" src="'. $picture .'" alt="photo" />';
     }
   }
@@ -323,7 +323,7 @@ function theme_vcard($account) {
     $name .= "</div>\n";
   }
   else {
-    $name = '<div class="fn">'. $account->name ."</div>\n";
+    $name = '<div class="fn org summary">'. $account->name ."</div>\n";
   }
 
   $street   = vcard_get_field('street', $account);
@@ -350,8 +350,8 @@ function theme_vcard($account) {
     $org = '<div class="org">'. $org ."</div>\n";
   }
 
-  $output .= '<div class="vcard">';
-  $output .= $photo;
+  $output  = '<div class="vcard">';
+  $output .= isset($photo) ? $photo : '';
   $output .= $name;
   $output .= $org;
   $output .= $address;
