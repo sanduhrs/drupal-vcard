@@ -1,6 +1,6 @@
 <?php
 // $Id$
- 
+
 /**
  * @file
  * Render a profile account with hCard microformat markup.

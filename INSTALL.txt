@@ -4,6 +4,9 @@ Installation instructions for vcard module:
 
 1) Install Contact_Vcard_Build from PEAR:
    $ pear install Contact_Vcard_Build
+   - OR - 
+   Install File_IMC from PEAR:
+   $ pear install File_IMC
 
 2) Enable vcard module on administer->modules
 
