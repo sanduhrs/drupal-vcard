@@ -121,14 +121,65 @@ function vcard_user($op, &$edit, &$account, $category = NULL) {
     // Check permissions
     if (user_access('have vcard', $account) && vcard_perm_check() && _vcard_init()) {
       // Attach vCard to profile
-      $account->content['vcard'] = array(
-        '#type' => 'user_profile_item',
-        '#title' => t('vCard'),
-        '#value' => theme('image', drupal_get_path('module', 'vcard') .'/vcard.png', t('Download vcard')) .' '. l(t('Download vcard'), 'user/'. $account->uid .'/vcard', array('absolute' => FALSE, 'html' => TRUE)),
-        '#weight' => 10,
-        '#attributes' => array('class' => 'vcard-link'),
-      );
+      $display_link = variable_get('vcard_display_profile_link', 1);
+      $display_hcard = variable_get('vcard_display_profile_hcard', 1);
+      if ($display_link || $display_hcard) {
+        $account->content['vcard'] = array(
+          '#type' => 'user_profile_category',
+          '#title' => t('vCard'),
+        );
+      }
+      if ($display_hcard) {
+        $account->content['vcard']['hcard'] = array(
+          '#type' => 'user_profile_item',
+          '#title' => t('hCard'),
+          '#value' => theme('vcard', $account, FALSE),
+          '#weight' => 5,
+          '#attributes' => array('class' => 'vcard-hcard'),
+        );
+      }
+      if ($display_link) {
+        $account->content['vcard']['link'] = array(
+          '#type' => 'user_profile_item',
+          '#title' => t('Download'),
+          '#value' => l(t('Download vcard'), 'user/' . $account->uid . '/vcard', array('absolute' => FALSE, 'html' => TRUE)),
+          '#weight' => 10,
+          '#attributes' => array('class' => 'vcard-link'),
+        );
+      }
     }
+  }
+}
+
+/**
+ * Implement hook_block().
+ */
+function vcard_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0] = array(
+      'info' => t("About the author (vCard)"), 
+      'region' => 'left',
+      'cache' => BLOCK_CACHE_PER_PAGE,
+    );
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    switch ($delta) {
+      case 0:
+        $account = new stdClass();
+        if (arg(0) == 'node' && is_numeric(arg(1))) {
+          $node = node_load(arg(1));
+          $account = user_load($node->uid);
+        }
+        if (isset($account->uid)) {
+          $block = array(
+            'subject' => t('About the author'), 
+            'content' => theme('vcard', $account, FALSE),
+          );
+        }
+        break;
+    }
+    return $block;
   }
 }
 
@@ -322,7 +373,7 @@ function _vcard_get_map($account) {
 function vcard_theme($existing, $type, $theme, $path) {
   return array(
     'vcard' => array(
-      'arguments' => array('account' => NULL),
+      'arguments' => array('account' => NULL, 'show_title' => TRUE),
       'template' => 'vcard',
     ),
   );
@@ -370,6 +421,7 @@ function vcard_get_raw($account) {
  *
  * The $variables array contains the following arguments:
  * - $account: A user object with 'name', 'uid' and 'picture' fields.
+ * - $show_title: A boolean to trigger the title.
  *
  * @see vcard.tpl.php
  */
@@ -395,14 +447,12 @@ function template_preprocess_vcard(&$variables) {
   
   // Prepare user picture
   $variables['user_picture'] = '';
-  if (!empty($vcard_raw->picture->uri)) {
-    $filepath = $vcard_raw->picture->uri;
-    $alt = t('Photo of @name', array('@name' => $account->name));
+  if (!empty($vcard_raw->picture)) {
+    $filepath = $vcard_raw->picture;
+    $alt = $title = t('Photo of @name', array('@name' => $account->name));
     if (variable_get('user_pictures', FALSE)) {
-      $variables['user_picture'] = theme('image_style', array('style_name' => $style, 'path' => $filepath, 'alt' => $alt, 'title' => $alt, 'attributes' => array('class' => 'photo'), 'getsize' => FALSE));
-    }
-    else {
-      $variables['user_picture'] = theme('image', array('path' => $filepath, 'alt' => $alt, 'title' => $alt, 'attributes' => array('class' => 'photo'), 'getsize' => FALSE));
+      //$variables['user_picture'] = theme('image', array('style_name' => $style, 'path' => $filepath, 'alt' => $alt, 'title' => $alt, 'attributes' => array('class' => 'photo'), 'getsize' => FALSE));
+      $variables['user_picture'] = theme('image', $filepath, $title, $alt, array('class' => 'photo'), FALSE);
     }
   }
 
