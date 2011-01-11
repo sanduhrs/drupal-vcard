@@ -8,6 +8,7 @@
  * Available variables:
  * - $account: The user object belonging to the vCard
  *     Not sanitized, use check_plain() or similar
+ * - $show_title: A boolean to trigger the title
  * - $vcard: The raw vCard data
  *     Not sanitized, use check_plain() or similar
  * - $givenname
@@ -28,7 +29,9 @@
  */
 ?>
 
-<h3><?php print ('About the author') ?></h3>
+<?php if ($show_title) : ?>
+  <h3><?php print ('About the author') ?></h3>
+<?php endif; ?>
 
 <div id="vcard-<?php print $account->uid ?>" class="vcard">
 

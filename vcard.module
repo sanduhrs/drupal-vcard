@@ -136,14 +136,63 @@ function vcard_user_view($account, $view_mode, $langcode) {
   // Check permissions
   if (user_access('have vcard', $account) && vcard_permission_check() && _vcard_init()) {
     // Attach vCard to profile
-    $account->content['vcard'] = array(
-      '#type' => 'user_profile_item',
-      '#title' => t('vCard'),
-      '#markup' => l(t('Download vcard'), 'user/' . $account->uid . '/vcard', array('absolute' => FALSE, 'html' => TRUE)),
-      '#weight' => 10,
-      '#attributes' => array('class' => 'vcard-link'),
-    );
+    $display_link = variable_get('vcard_display_profile_link', 1);
+    $display_hcard = variable_get('vcard_display_profile_hcard', 1);
+    if ($display_link || $display_hcard) {
+      $account->content['vcard'] = array(
+        '#type' => 'user_profile_category',
+        '#title' => t('vCard'),
+      );
+    }
+    if ($display_hcard) {
+      $account->content['vcard']['hcard'] = array(
+        '#type' => 'user_profile_item',
+        '#markup' => theme('vcard', array('account' => $account, 'show_title' => FALSE)),
+        '#weight' => 5,
+        '#attributes' => array('class' => 'vcard-hcard'),
+      );
+    }
+    if ($display_link) {
+      $account->content['vcard']['link'] = array(
+        '#type' => 'user_profile_item',
+        '#markup' => l(t('Download vcard'), 'user/' . $account->uid . '/vcard', array('absolute' => FALSE, 'html' => TRUE)),
+        '#weight' => 10,
+        '#attributes' => array('class' => 'vcard-link'),
+      );
+    }
   }
+}
+
+/**
+ * Implement hook_block_info().
+ */
+function vcard_block_info() {
+  $blocks['vcard'] = array(
+    'info' => t('About the author (vCard)'), 
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implement hook_block_view().
+ */
+function vcard_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'vcard':
+      $account = new stdClass();
+      if (arg(0) == 'node' && is_numeric(arg(1))) {
+        $node = node_load(arg(1));
+        $account = user_load($node->uid);
+      }
+      if (isset($account->uid)) {
+        $block['subject'] = t('About the author');
+        $block['content'] = theme('vcard', array('account' => $account, 'show_title' => FALSE));
+      }
+      break;
+  }
+  return $block;
 }
 
 /**
@@ -332,7 +381,7 @@ function _vcard_get_map($account) {
 function vcard_theme($existing, $type, $theme, $path) {
   return array(
     'vcard' => array(
-      'variables' => array('account' => NULL),
+      'variables' => array('account' => NULL, 'show_title' => TRUE),
       'template' => 'vcard',
     ),
   );
@@ -380,6 +429,7 @@ function vcard_get_raw($account) {
  *
  * The $variables array contains the following arguments:
  * - $account: A user object with 'name', 'uid' and 'picture' fields.
+ * - $show_title: A boolean to trigger the title.
  *
  * @see vcard.tpl.php
  */
