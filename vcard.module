@@ -231,8 +231,8 @@ function vcard_get($account) {
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  if (isset($vcard->mail)) {
-    $vcard->addEmail(check_plain($vcard->mail));
+  if (isset($vcard_raw->mail)) {
+    $vcard->addEmail(check_plain($vcard_raw->mail));
     $vcard->addParam('ENCODING', '8BIT');
   }
   $vcard->addNickname(check_plain($account->name));
