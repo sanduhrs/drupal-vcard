@@ -147,6 +147,7 @@ function vcard_user_view($account, $view_mode, $langcode) {
     if ($display_hcard) {
       $account->content['vcard']['hcard'] = array(
         '#type' => 'user_profile_item',
+        '#title' => t('hCard'),
         '#markup' => theme('vcard', array('account' => $account, 'show_title' => FALSE)),
         '#weight' => 5,
         '#attributes' => array('class' => 'vcard-hcard'),
@@ -155,6 +156,7 @@ function vcard_user_view($account, $view_mode, $langcode) {
     if ($display_link) {
       $account->content['vcard']['link'] = array(
         '#type' => 'user_profile_item',
+        '#title' => t('Download'),
         '#markup' => l(t('Download vcard'), 'user/' . $account->uid . '/vcard', array('absolute' => FALSE, 'html' => TRUE)),
         '#weight' => 10,
         '#attributes' => array('class' => 'vcard-link'),
