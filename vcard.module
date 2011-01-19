@@ -58,6 +58,30 @@ function vcard_help($path, $arg) {
           '!microformat' => l('microformat', 'http://microformats.org'),
         )
       );
+      break;
+    case 'admin/config/people/profile':
+      return t("<p>
+        For assistance setting up a default profile with common fields, visit
+        <a href='!vcard_settings_link'>the VCard settings</a> which can preset an automatic profile definition.
+      </p><p>
+        To enable machine-readable <a href='!microformat_link'>microformats</a>
+        for your profiles, see the <a href='!vcard_help_link'>vCard help</a> and README.
+      </p>",
+      array(
+        '!vcard_settings_link' => url('admin/config/people/vcard'),
+        '!vcard_help_link' => url('admin/help/vcard'),
+        '!microformat_link' => url('http://microformats.org'),
+      )
+    );
+    case 'admin/config/people/vcard':
+      return t("
+        Profile fields are added and administered on
+        <a href='!profile_settings_link'>the Profile Configuration page</a>.
+      ",
+      array(
+        '!profile_settings_link' => url('admin/config/people/profile'),
+      )
+    );
   }
 }
 
@@ -128,8 +152,8 @@ function vcard_permission_check() {
 }
 
 /**
- * Implement hook_user_view(). 
- * 
+ * Implement hook_user_view().
+ *
  * Adds a vcard icon and link to the user page
  */
 function vcard_user_view($account, $view_mode, $langcode) {
@@ -170,7 +194,7 @@ function vcard_user_view($account, $view_mode, $langcode) {
  */
 function vcard_block_info() {
   $blocks['vcard'] = array(
-    'info' => t('About the author (vCard)'), 
+    'info' => t('About the author (vCard)'),
     'cache' => DRUPAL_NO_CACHE,
   );
   return $blocks;
@@ -210,7 +234,7 @@ function vcard_get($account) {
 
   if (isset($vcard_raw->picture->uri)) {
     $filepath = file_create_url($vcard_raw->picture->uri);
-    $vcard->setPhoto($filepath); 
+    $vcard->setPhoto($filepath);
     $vcard->addParam('VALUE', 'uri');
     $vcard->addParam('ENCODING', '8BIT');
   }
@@ -292,7 +316,7 @@ function vcard_get($account) {
 
 /**
  * VCard for direct download
- * 
+ *
  * Prints to the browser for direct download, then exits
  */
 function vcard_fetch($account) {
@@ -319,7 +343,7 @@ function _vcard_init() {
   if (@include_once('File/IMC.php')) {
     $vcard =& File_IMC::build('vCard', '3.0');
   }
-  else if (@include_once('Contact_Vcard_Build.php')) {
+  elseif (@include_once('Contact_Vcard_Build.php')) {
     $vcard = new Contact_Vcard_Build();
   }
   return empty($vcard) ? FALSE : $vcard;
@@ -408,14 +432,14 @@ function vcard_get_raw($account) {
     if ($account->picture) {
       $vcard_raw[$account->uid]->picture = $account->picture;
     }
-  
+
     // Geolocation
     // TODO: Test with Location module
     if (isset($account->location) && $account->location['latitude'] && $account->location['longitude']) {
       $vcard[$account->uid]->location['latitude']  = $account->location['latitude'];
       $vcard[$account->uid]->location['longitude'] = $account->location['longitude'];
     }
-  
+
     if (user_access('download vcard with email')) {
       $vcard_raw[$account->uid]->mail = $account->mail;
     }
@@ -437,7 +461,7 @@ function vcard_get_raw($account) {
  */
 function template_preprocess_vcard(&$variables) {
   $account = $variables['account'];
-  
+
   $vcard_raw = vcard_get_raw($account);
   foreach ($vcard_raw as $key => $value) {
     // Sanitize data for possible html output
@@ -454,7 +478,7 @@ function template_preprocess_vcard(&$variables) {
       // Which is taken from the user object and already is sanitized
     }
   }
-  
+
   // Prepare user picture
   $variables['user_picture'] = '';
   if (!empty($vcard_raw->picture->uri)) {
