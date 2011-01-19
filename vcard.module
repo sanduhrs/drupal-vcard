@@ -11,6 +11,9 @@
  * This module creates downloadable vCards based on profile fields.
  * It is possible to output hCards (http://en.wikipedia.org/wiki/Hcard)
  * on a user's profile page via themeable function.
+ *
+ * @author
+ * Stefan Auditor <stefan.auditor@erdfisch.de>
  */
 
 /**
