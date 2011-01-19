@@ -74,11 +74,11 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
 
     // Load in all currently existing fields, to see what exists and what they are matched to so far.
     $available_fields = array();
-    $available_fields_result = db_query('SELECT * FROM {profile_fields} ORDER BY weight ');
+    $available_fields_result = db_query("SELECT * FROM {profile_fields} ORDER BY weight");
     while ($field = db_fetch_object($available_fields_result)) {
       // Index these on a version of the internal id, not the text label
       $key = preg_replace('|^profile_|', '', $field->name);
-      if ($linked = variable_get('vcard_profile_'. $field->fid, "")) {
+      if ($linked = variable_get('vcard_profile_'. $field->fid, '')) {
         // This field is already linked to a vcard tag. Add it to the index in the right place
         $key = $linked;
       }
@@ -97,23 +97,23 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
           "<a href='!field_link'>%field_label</a> already exists as a profile field. %alt_name",
           array(
             '%field_label' => $required_field_label,
-            '!field_link'  => url('admin/user/profile/edit/'. $field_def->fid),
+            '!field_link'  => url('admin/user/profile/edit/' . $field_def->fid),
             '%alt_name'    => (($field_def->title != $required_field_label) ? " (called $field_def->title)" : "")
           )
         ));
         variable_set('vcard_profile_'. $field_def->name, $required_field_id);
         // don't let the form submission override this now...
-        unset($form_state['values']['vcard_profile_'. $field_def->name]);
+        unset($form_state['values']['vcard_profile_' . $field_def->name]);
       }
       else {
         // need to make it
-        drupal_set_message(t("Creating profile field ") . $required_field_label);
+        drupal_set_message(t("Creating profile field @label", array('@label' => $required_field_label)));
         /**
          * @see profile_field_form_submit()
          */
         $field_def = array(
           'title'       => $required_field_label,
-          'name'        => 'profile_'. $required_field_id,
+          'name'        => 'profile_' . $required_field_id,
           'explanation' => '',
           'category'    => 'Contact Information',
           'type'        => 'textfield',
@@ -131,7 +131,7 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
 
         drupal_write_record('profile_fields', $field_def);
         // retrieve its new ID
-        $result = db_query('SELECT * FROM {profile_fields} WHERE name = "%s"', $field_def['name']);
+        $result = db_query("SELECT * FROM {profile_fields} WHERE name = '%s'", $field_def['name']);
         $field_def = db_fetch_object($result);
       }
       // Now check the right profile field is matched up with the right vcard field
@@ -145,9 +145,9 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
             '!field_link' => url('admin/user/profile/edit/'. $field_def->fid)
           )
         ));
-        variable_set('vcard_profile_'. $field_def->name, $required_field_id);
+        variable_set('vcard_profile_' . $field_def->name, $required_field_id);
         // don't let the form submission override this now...
-        unset($form_state['values']['vcard_profile_'. $field_def->name]);
+        unset($form_state['values']['vcard_profile_' . $field_def->name]);
       }
     }
     drupal_set_message(t("
