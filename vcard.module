@@ -17,6 +17,16 @@
  */
 
 /**
+ * Implementation of hook_views_api().
+ */
+function vcard_views_api() {
+  return array(
+    'api' => 2.0,
+    'path' => drupal_get_path('module', 'vcard') . '/includes',
+  );
+}
+
+/**
  * Implement hook_requirements().
  */
 function vcard_requirements($phase) {
