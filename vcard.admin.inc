@@ -1,5 +1,5 @@
 <?php
-/* $Id$ */
+// $Id$
 
 /**
  * @file
@@ -50,7 +50,7 @@ function vcard_admin_settings() {
     '#value' => t('Auto-create profile fields'),
     '#description' => t("Attempt to create the normal required profile fields, if you haven't already done so'"),
   );
-  $form['#submit'][] = 'vcard_auto_create_profile_submit'; 
+  $form['#submit'][] = 'vcard_auto_create_profile_submit';
 
   return system_settings_form($form);
 }
@@ -60,7 +60,7 @@ function vcard_admin_settings() {
  * names.
  *
  * Capture the vcard settings submission, and act on the button if pressed.
- *  
+ *
  * Although I could have just over-written everything, instead I take care to
  * absorb half-profiles that have already been made, possibly with different
  * names, and not replace anything that already works OK. This process just adds
@@ -94,10 +94,10 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
       if (in_array($required_field_id, array_keys($available_fields))) {
         $field_def = $available_fields[$required_field_id];
         drupal_set_message(t(
-          "<a href='!field_link'>%field_label</a> already exists as a profile field. %alt_name", 
+          "<a href='!field_link'>%field_label</a> already exists as a profile field. %alt_name",
           array(
-            '%field_label' => $required_field_label, 
-            '!field_link'  => url('admin/user/profile/edit/'. $field_def->fid), 
+            '%field_label' => $required_field_label,
+            '!field_link'  => url('admin/user/profile/edit/'. $field_def->fid),
             '%alt_name'    => (($field_def->title != $required_field_label) ? " (called $field_def->title)" : "")
           )
         ));
@@ -108,20 +108,26 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
       else {
         // need to make it
         drupal_set_message(t("Creating profile field ") . $required_field_label);
-        // @see profile_field_form_submit()
+        /**
+         * @see profile_field_form_submit()
+         */
         $field_def = array(
-          'title'       => $required_field_label, 
-          'name'        => 'profile_'. $required_field_id, 
-          'explanation' => '', 
-          'category'    => 'Contact Information', 
-          'type'        => 'textfield', 
-          'weight'      => 0, 
-          'required'    => 0, 
-          'register'    => 1, 
+          'title'       => $required_field_label,
+          'name'        => 'profile_'. $required_field_id,
+          'explanation' => '',
+          'category'    => 'Contact Information',
+          'type'        => 'textfield',
+          'weight'      => 0,
+          'required'    => 0,
+          'register'    => 1,
           'visibility'  => 2,
         );
-        if ($required_field_id == 'url') {$field_def['type']='url';}
-        if ($required_field_id == 'birthday') {$field_def['type']='date';}
+        if ($required_field_id == 'url') {
+          $field_def['type']='url';
+        }
+        if ($required_field_id == 'birthday') {
+          $field_def['type']='date';
+        }
 
         drupal_write_record('profile_fields', $field_def);
         // retrieve its new ID
@@ -131,7 +137,7 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
       // Now check the right profile field is matched up with the right vcard field
       if ($field_def && (variable_get('vcard_profile_'. $field_def->fid, '') != $required_field_id)) {
         drupal_set_message(t(
-          "Assigning profile field %fid (<a href='!field_link'>%title</a>) to vcard key %required_field_id", 
+          "Assigning profile field %fid (<a href='!field_link'>%title</a>) to vcard key %required_field_id",
           array(
             '%fid' => $field_def->fid,
             '%title' => $field_def->title,
@@ -146,9 +152,9 @@ function vcard_auto_create_profile_submit($form, &$form_state) {
     }
     drupal_set_message(t("
       Created profile fields! You may want to review the profile settings
-      individually to ensure their display order and public visibility 
-      settings are right for you. 
-      By default they are all displayed on the users profile page.  
+      individually to ensure their display order and public visibility
+      settings are right for you.
+      By default they are all displayed on the users profile page.
     "));
   }
   cache_clear_all();

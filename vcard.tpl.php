@@ -30,12 +30,12 @@
 ?>
 
 <?php if ($show_title) : ?>
-  <h3><?php print ('About the author') ?></h3>
+  <h3><?php print t('About the author') ?></h3>
 <?php endif; ?>
 
 <div id="vcard-<?php print $account->uid ?>" class="vcard">
 
-  <?php if ($user_picture) : ?> 
+  <?php if ($user_picture) : ?>
     <?php print $user_picture ?>
   <?php endif; ?>
 
@@ -52,8 +52,8 @@
   <?php if (isset($mail)) :?>
     <a class="email" href="mailto:<?php print $mail ?>"><?php print $mail ?></a>
   <?php endif; ?>
-  
-  <?php if ($street || $city || $province || $postal || $country ) : ?>  
+
+  <?php if ($street || $city || $province || $postal || $country ) : ?>
     <div class="adr">
 
     <?php if ($street) : ?>

@@ -10,7 +10,7 @@
  */
 
 /**
- * Implementation of hook_views_data()
+ * Implementation of hook_views_data().
  */
 function vcard_views_data() {
   $data['users']['download_vcard'] = array(
