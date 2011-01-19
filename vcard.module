@@ -449,7 +449,7 @@ function vcard_get_raw($account) {
   }
 
   // Allow to alter the values
-  drupal_alter('vcard_data', $vcard_raw[$account->uid]);
+  drupal_alter('vcard_data', $vcard_raw[$account->uid], $account);
   return $vcard_raw[$account->uid];
 }
 
