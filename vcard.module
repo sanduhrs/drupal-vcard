@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function vcard_help($section) {
   switch ($section) {
