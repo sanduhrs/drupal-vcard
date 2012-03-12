@@ -396,7 +396,7 @@ function _vcard_get_map($account) {
   $profile_fields = _vcard_profile_fields();
   foreach ($profile_fields as $field_name => $field_label) {
     $mapped = variable_get('vcard_profile_' . $field_name, 0);
-    if ($mapped) {
+    if ($mapped && isset($account->{$field_name})) {
       $map[$mapped] = $account->{$field_name};
     }
   }
