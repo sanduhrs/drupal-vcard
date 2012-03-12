@@ -38,7 +38,7 @@
     <?php print $user_picture ?>
   <?php endif; ?>
 
-  <?php if ($givenname && $familyname) : ?>
+  <?php if (isset($givenname) && isset($familyname)) : ?>
     <div class="n fn">
       <span class="given-name"><?php print $givenname ?></span>
       <span class="family-name"><?php print $familyname ?></span>
@@ -52,36 +52,36 @@
     <a class="email" href="mailto:<?php print $mail ?>"><?php print $mail ?></a>
   <?php endif; ?>
 
-  <?php if ($street || $city || $province || $postal || $country ) : ?>
+  <?php if (isset($street) || isset($city) || isset($province) || isset($postal) || isset($country)) : ?>
     <div class="adr">
 
-    <?php if ($street) : ?>
+    <?php if (isset($street)) : ?>
       <div class="street-address"><?php print $street ?></div>
     <?php endif; ?>
 
-    <?php if ($city) : ?>
+    <?php if (isset($city)) : ?>
       <span class="locality"><?php print $city ?></span>
     <?php endif; ?>
 
-    <?php if ($province) : ?>
+    <?php if (isset($province)) : ?>
       <span class="region"><?php print $province ?></span>
     <?php endif; ?>
 
-    <?php if ($postal) : ?>
+    <?php if (isset($postal)) : ?>
       <span class="postal-code"><?php print $postal ?></span>
     <?php endif; ?>
 
-    <?php if ($country) : ?>
+    <?php if (isset($country)) : ?>
       <span class="country-name"><?php  print $country  ?></span>
     <?php endif; ?>
     </div>
   <?php endif; ?>
 
-  <?php if ($telephone) : ?>
+  <?php if (isset($telephone)) : ?>
     <div class="tel"><?php print $telephone ?></div>
   <?php endif; ?>
 
-  <?php if ($organization) : ?>
+  <?php if (isset($organization)) : ?>
     <div class="org"><?php print $organization ?></div>
   <?php endif; ?>
 
