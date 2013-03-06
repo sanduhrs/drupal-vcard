@@ -31,6 +31,20 @@ function vcard_admin_settings() {
   $options = array('' => t('<Select a property>'));
   $options = $options + _vcard_properties();
   $profile_fields = _vcard_profile_fields();
+
+  $form['vcard_use_profile'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use Legacy Profile Fields'),
+    '#default_value' => variable_get('vcard_use_profile', FALSE),
+    '#description' => t('Should vCard use legacy Profile Fields instead of Account fields in Core.'),
+  );
+
+  if (!module_exists('profile')) {
+    $form['vcard_use_profile']['#disabled'] = TRUE;
+    $form['vcard_use_profile']['#default_value'] = FALSE;
+    $form['vcard_use_profile']['#description'] = t('Only Account Fields are allowed unless Profile module is enabled');
+  }
+
   $form['field_mappings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Field Mappings'),

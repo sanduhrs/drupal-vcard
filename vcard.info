@@ -1,6 +1,5 @@
 name = vCard
 description = "Allows vcard export of user data"
-dependencies[] = profile
 core = 7.x
 files[] = vcard.module
 files[] = vcard.admin.inc

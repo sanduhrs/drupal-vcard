@@ -231,6 +231,11 @@ function vcard_block_view($delta = '') {
 function vcard_get($account) {
   $vcard_raw = vcard_get_raw($account);
 
+  // First set all variables to blank in case they are not mapped
+  foreach(_vcard_properties() as $field => $title) {
+    $variables[$field] = '';
+  }
+
   $vcard = _vcard_init();
   $vcard->addParam('ENCODING', '8BIT');
 
@@ -373,23 +378,37 @@ function _vcard_properties() {
 /**
  * Returns the list of field names => field labels available through
  * profile.module
+ *
+ * @todo Remove legacy code
  */
 function _vcard_profile_fields($value = 'name') {
   $field_list = array();
-  // Use the profile.module internals to retrieve an enumeration of available fields.
-  // Avoid getting at the DB directly.
-  $categories = profile_user_categories();
-  foreach ($categories as $category_def) {
-    $field_lookup = _profile_get_fields($category_def['name']);
-    foreach ($field_lookup as $field) {
-      $field_list[$field->name] = $field->title;
+
+  if (variable_get('vcard_use_profile', FALSE)) {
+    // Legacy code: Support for deprecated profile module
+    // Use the profile.module internals to retrieve an enumeration of available fields.
+    // Avoid getting at the DB directly.
+    $categories = profile_user_categories();
+    foreach ($categories as $category_def) {
+      $field_lookup = _profile_get_fields($category_def['name']);
+      foreach ($field_lookup as $field) {
+        $field_list[$field->name] = $field->title;
+      }
     }
+  } else {
+    // Support for D7 fields
+    $user_fields = field_info_instances('user', 'user');
+    foreach ($user_fields as $user_field) {
+      $field_list[$user_field['field_name']] = $user_field['label'];
+     }
   }
   return $field_list;
 }
 
 /**
  * Returns an array of profilefield-to-vcard attribute fieldnames
+ *
+ * @todo remove legacy code
  */
 function _vcard_get_map($account) {
   $map = array();
@@ -397,7 +416,23 @@ function _vcard_get_map($account) {
   foreach ($profile_fields as $field_name => $field_label) {
     $mapped = variable_get('vcard_profile_' . $field_name, 0);
     if ($mapped && isset($account->{$field_name})) {
-      $map[$mapped] = $account->{$field_name};
+
+      // Legacy code: Support for deprecated profile module
+      // Use fields off the Profile Module
+      if (variable_get('vcard_use_profile', FALSE)) {
+        $map[$mapped] = $account->{$field_name};
+      } else {
+        // Support for D7 fields
+        //See if there is a safe value we can use
+        if (array_key_exists('und', $account->{$field_name}) &&  $account->{$field_name}['und']) {
+          if (array_key_exists('safe_value', $account->{$field_name}['und'][0])) {
+            $map[$mapped] = $account->{$field_name}['und'][0]['safe_value'];
+          } else {
+            $map[$mapped] = $account->{$field_name}['und'][0]['value'];
+          }
+        }
+      }
+
     }
   }
   return $map;

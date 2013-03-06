@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * vCard is a file format standard for electronic business cards.
+ *
+ * Install / Uninstall / Update Settings
+ */
+
+/**
+ * Sets new Profile vs Account setting checkbox to use Profile fields for
+ * backwards compatability
+ */
+function vcard_update_7101(&$sandbox) {
+  // Default existing installations to use deprecated profile module
+  variable_set('vcard_use_profile', TRUE);
+}
