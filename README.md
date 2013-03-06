@@ -18,8 +18,8 @@ Bug reports and feature requests go to
 [vCard Issue Queue](http://drupal.org/node/add/project-issue/vcard 'vCard Issue Queue')
 
 ## Maintainers
-[sanduhrs](http://drupal.org/user/28074)
-[walkah](http://drupal.org/user/1531)
+* [sanduhrs](http://drupal.org/user/28074)
+* [walkah](http://drupal.org/user/1531)
 
 ## License
 Licensed under the GNU General Public License, GPL v2.
