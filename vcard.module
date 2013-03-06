@@ -159,11 +159,12 @@ function vcard_permission_check() {
  * Adds a vcard icon and link to the user page
  */
 function vcard_user_view($account, $view_mode, $langcode) {
+  $display_hcard = variable_get('vcard_display_profile_hcard', 1);
+
   // Check permissions
   if (user_access('have vcard', $account) && vcard_permission_check() && _vcard_init()) {
     // Attach vCard to profile
     $display_link = variable_get('vcard_display_profile_link', 1);
-    $display_hcard = variable_get('vcard_display_profile_hcard', 1);
     if ($display_link || $display_hcard) {
       $account->content['vcard'] = array(
         '#type' => 'user_profile_category',
@@ -188,6 +189,21 @@ function vcard_user_view($account, $view_mode, $langcode) {
         '#attributes' => array('class' => 'vcard-link'),
       );
     }
+  }
+  if (!$display_hcard) {
+    $accound_fields = _vcard_get_map($account);
+    $field_map = _vcard_field_map();
+    $account->content['#prefix'] = '<div class="vcard author">';
+    $account->content['#suffix'] = '</div>';
+    foreach($field_map as $user_field => $vcard_field) {
+      //If the user has access to this data, then add a span class for the hcard.
+      if (array_key_exists($user_field, $account->content)) {
+        $account->content[$user_field][0]['#prefix'] = '<span class="'. str_replace('_', '-', $vcard_field) .'">';
+        $account->content[$user_field][0]['#suffix'] = '</span>';
+      }
+    }
+    $account->content['nickname']['#markup'] = '<span style="visibility:hidden;position: absolute;" height="0px"><a class="nickname url uid" href="'. url('user/' . $account->uid, array('absolute' => TRUE)) .'" rel="me">' . $account->name . '</a></span>';
+    $account->content['nickname']['#weight'] = 99;
   }
 }
 
@@ -246,13 +262,13 @@ function vcard_get($account) {
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  if (isset($vcard_raw->givenname) && isset($vcard_raw->familyname)) {
-    $givenname  = $vcard_raw->givenname;
-    $familyname = $vcard_raw->familyname;
+  if (isset($vcard_raw->given_name) && isset($vcard_raw->family_name)) {
+    $given_name  = $vcard_raw->given_name;
+    $family_name = $vcard_raw->family_name;
 
-    $vcard->setName($familyname, $givenname, '', '', '');
+    $vcard->setName($family_name, $given_name, '', '', '');
     $vcard->addParam('ENCODING', '8BIT');
-    $vcard->setFormattedName($givenname . ' ' . $familyname);
+    $vcard->setFormattedName($given_name . ' ' . $family_name);
     $vcard->addParam('ENCODING', '8BIT');
   }
   else {
@@ -284,8 +300,8 @@ function vcard_get($account) {
   $vcard->addParam('ENCODING', '8BIT');
 
   // Organization
-  if (isset($vcard_raw->organization)) {
-    $vcard->addOrganization($vcard_raw->organization);
+  if (isset($vcard_raw->org)) {
+    $vcard->addorg($vcard_raw->org);
     $vcard->addParam('ENCODING', '8BIT');
   }
 
@@ -360,19 +376,22 @@ function _vcard_init() {
  *
  */
 function _vcard_properties() {
-  return array(
-    'givenname'     => t('Given Name'),
-    'familyname'    => t('Family name'),
-    'birthday'      => t('Birthday'),
-    'organization'  => t('Organization'),
-    'telephone'     => t('Telephone'),
-    'url'           => t('URL'),
-    'street'        => t('Street'),
-    'city'          => t('City'),
-    'postal'        => t('Postal'),
-    'province'      => t('Province'),
-    'country'       => t('Country'),
+  $fields =  array(
+    'given_name'        => t('Given Name'),
+    'family_name'       => t('Family name'),
+    'birthday'          => t('Birthday'),
+    'org'               => t('org'),
+    'tel'               => t('tel'),
+    'url'               => t('URL'),
+    'street_address'    => t('Street'),
+    'locality'          => t('City'),
+    'postal_code'       => t('Postal'),
+    'region'            => t('Province'),
+    'country_name'      => t('Country'),
   );
+
+  drupal_alter('vcard_fields', $fields);
+  return $fields;
 }
 
 /**
@@ -531,4 +550,19 @@ function template_preprocess_vcard(&$variables) {
 
   $variables['account'] = $account;
   $variables['vcard']   = $vcard_raw;
+}
+
+/**
+ * Returns an array of profilefield-to-vcard attribute fieldnames
+ */
+function _vcard_field_map() {
+  $map = array();
+  $profile_fields = _vcard_profile_fields();
+  foreach ($profile_fields as $field_name => $field_label) {
+    $mapped = variable_get('vcard_profile_' . $field_name, 0);
+    if ($mapped) {
+      $map[$field_name] = $mapped;
+    }
+  }
+  return $map;
 }
