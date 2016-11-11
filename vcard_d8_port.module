@@ -1,0 +1,37 @@
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\file;
+use Drupal\Core\Entity\EntityStorageInterface;
+
+/**
+ * Ensures the vcard PEAR library is available and returns the vCard builder
+ * object.
+ *
+ * @return vCard object, null if library is not available.
+ */
+function _vcard_init() {
+  if (@include_once('Contact_Vcard_Build.php')) {
+    $vcard = new Contact_Vcard_Build();
+  }
+  return isset($vcard) ? $vcard : FALSE;
+}
+
+/**
+ *
+ */
+function _vcard_properties() {
+  return array(
+    'givenname'     => t('Given Name'),
+    'familyname'    => t('Family name'),
+    'birthday'      => t('Birthday'),
+    'organization'  => t('Organization'),
+    'telephone'     => t('Telephone'),
+    'url'           => t('URL'),
+    'street'        => t('Street'),
+    'city'          => t('City'),
+    'postal'        => t('Postal'),
+    'province'      => t('Province'),
+    'country'       => t('Country'),
+  );
+}

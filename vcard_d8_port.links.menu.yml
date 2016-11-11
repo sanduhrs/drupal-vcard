@@ -1,0 +1,7 @@
+vcard_d8_port.admin_settings:
+ title: 'vCard'
+ description: 'Allows vcard export of user data.'
+ route_name: vcard_d8_port.settings
+ parent: system.admin_config_media
+
+

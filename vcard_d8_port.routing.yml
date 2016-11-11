@@ -1,0 +1,7 @@
+vcard_d8_port.settings:
+ path: 'admin/config/media/vcard'
+ defaults:
+  _form: '\Drupal\vcard_d8_port\Form\VCardSettingsForm'
+  _title: 'vCard'
+ requirements:
+  _permission: 'administer site configuration'

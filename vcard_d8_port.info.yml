@@ -1,4 +1,4 @@
 name: vCard
 type: module
-description: 'TAllows vcard export of user data.'
+description: 'Allows vcard export of user data.'
 core: 8.x
