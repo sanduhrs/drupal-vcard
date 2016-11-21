@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implement hook_requirements().
+ */
+function vcard_requirements($phase) {
+  $requirement = array();
+  $init = _vcard_init();
+
+  if ($phase === 'runtime') {
+    $requirement['vcard'] = array(
+      'title' => t('PEAR Contact_Vcard_Build'),
+      'value' => $init ? t('Available.') : t('Not available.'),
+      'description' => t(l('PEAR Contact_Vcard_Build package', 'http://pear.php.net/package/Contact_Vcard_Build') . ' for vcard generation.'),
+      'severity' => $init ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+    );
+  }
+
+  return $requirement;
+}
