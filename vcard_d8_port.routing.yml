@@ -4,4 +4,13 @@ vcard_d8_port.settings:
   _form: '\Drupal\vcard_d8_port\Form\VCardSettingsForm'
   _title: 'vCard'
  requirements:
-  _permission: 'administer site configuration'
+  _permission: 'administer vcard'
+
+vcard_d8_port.user_check:
+ path: 'user/{user}/check'
+ defaults:
+  _title: 'Check User Details'
+  _controller: '\Drupal\vcard_d8_port\Controller\VCardD8PortController::vcardFetch'
+ requirements:
+  _permission: 'download vcard'
+
