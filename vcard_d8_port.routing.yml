@@ -7,7 +7,7 @@ vcard_d8_port.settings:
   _permission: 'administer vcard'
 
 vcard_d8_port.user_check:
- path: 'user/{user}/check'
+ path: 'user/{user}/vcard'
  defaults:
   _title: 'Check User Details'
   _controller: '\Drupal\vcard_d8_port\Controller\VCardD8PortController::vcardFetch'
