@@ -231,9 +231,18 @@ function vcard_get($user) {
     $vcard->setFormattedname(HTML::escape($name));
     $vcard->addParam('ENCODING', '8BIT');
   }
+
+  // Email
+  if(!empty($user->get('mail'))) {
+    $mail = $user->get('mail')->value;
+    $vcard->addEmail(HTML::escape($mail));
+    $vcard->addParam('ENCODING', '8BIT');
+  }
+
   // Nickname
   $vcard->addNickname(HTML::escape($name));
   $vcard->addParam('ENCODING', '8BIT');
+
   // Birthday
   if (isset($birthday)) {
     if (is_array($birthday)) {
@@ -255,12 +264,7 @@ function vcard_get($user) {
     $vcard->addTelephone($telephone);
     $vcard->addParam('ENCODING', '8BIT');
   }
-  // Email
-  if(!empty($user->get('mail'))) {
-    $mail = $user->get('mail')->value;
-    $vcard->addEmail(HTML::escape($mail));
-    $vcard->addParam('ENCODING', '8BIT');
-  }
+
   // Organization
   if (isset($organization)) {
     $vcard->addOrganization($organization);
