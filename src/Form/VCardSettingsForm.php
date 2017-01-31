@@ -30,33 +30,33 @@ class VCardSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('vcard.settings');
     if (!_vcard_init()) {
-      drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'warning');
+      drupal_set_message($this->t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'warning');
     }
 
     $form['display'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Display Settings'),
+      '#title' => $this->t('Display Settings'),
     );
     $form['display']['vcard_display_profile_link'] = array(
       '#type' => 'checkbox',
-      '#title' => t("Show vCard download link on user's profile"),
+      '#title' => $this->t("Show vCard download link on user's profile"),
       '#default_value' => $config->get('vcard_display_profile_link', 1),
     );
     $form['display']['vcard_display_profile_hcard'] = array(
       '#type' => 'checkbox',
-      '#title' => t("Show hCard on user's profile"),
+      '#title' => $this->t("Show hCard on user's profile"),
       '#default_value' => $config->get('vcard_display_profile_hcard', 1),
     );
 
-    $user = User::load(\Drupal::currentUser()->id());
+    $user = User::load($this::currentUser()->id());
     $user_fields = $user->getFieldDefinitions('user', 'user');
     $options = array('' => 'Select a property');
     $options = $options + _vcard_properties();
 
     $form['field_mappings'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Field Mappings'),
-      '#description' => t('You must first define a few profile fields before you can map them to vCard properties.'),
+      '#title' => $this->t('Field Mappings'),
+      '#description' => $this->t('You must first define a few profile fields before you can map them to vCard properties.'),
     );
 
     foreach ($user_fields as $field_name => $field_definition) {
@@ -79,7 +79,7 @@ class VCardSettingsForm extends ConfigFormBase {
    * Implments submit callback for vCard
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = \Drupal::service('config.factory')->getEditable('vcard.settings');
+    $config = $this::service('config.factory')->getEditable('vcard.settings');
     //Savng User Mapping Field
     $user_fields = vcard_get_user_fields();
     foreach ($user_fields as $key => $value) {
@@ -94,6 +94,6 @@ class VCardSettingsForm extends ConfigFormBase {
     $display_settings_hcard = $form_state->getValue('vcard_display_profile_hcard');
     $config->set('vcard_display_profile_hcard', $display_settings_hcard)->save();
 
-    drupal_set_message(t('Configurations have been saved.'));
+    drupal_set_message($this->t('Configurations have been saved.'));
   }
 }
