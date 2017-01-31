@@ -13,4 +13,3 @@ vcard.user_check:
   _controller: '\Drupal\vcard\Controller\VCardController::vcardFetch'
  requirements:
   _permission: 'download vcard'
-

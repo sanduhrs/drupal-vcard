@@ -10,6 +10,7 @@ use Drupal\user\Entity\User;
  * Configure download count settings.
  */
 class VCardSettingsForm extends ConfigFormBase {
+  
   /**
    * {@inheritdoc}
    */
@@ -75,25 +76,25 @@ class VCardSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * {@inheritdoc}
-   * Implments submit callback for vCard
+   * {@inheritdoc} Implments submit callback for vCard.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this::service('config.factory')->getEditable('vcard.settings');
-    //Savng User Mapping Field
+    // Savng User Mapping Field.
     $user_fields = vcard_get_user_fields();
     foreach ($user_fields as $key => $value) {
       $user_field_mapping = $form_state->getValue('vcard_user_fields_'.$key);
       $config->set('vcard_user_fields_'.$key, $user_field_mapping)->save();
     }
-    //Savng Display settings for vCard
+    // Savng Display settings for vCard.
     $display_settings_vcard = $form_state->getValue('vcard_display_profile_link');
     $config->set('vcard_display_profile_link', $display_settings_vcard)->save();
 
-    //Savng Display settings for hCard
+    // Savng Display settings for hCard.
     $display_settings_hcard = $form_state->getValue('vcard_display_profile_hcard');
     $config->set('vcard_display_profile_hcard', $display_settings_hcard)->save();
 
     drupal_set_message($this->t('Configurations have been saved.'));
   }
+  
 }
