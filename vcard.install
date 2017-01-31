@@ -2,6 +2,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Implements hook_requirements().
