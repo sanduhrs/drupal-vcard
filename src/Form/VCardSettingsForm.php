@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\vcard_d8_port\Form;
+namespace Drupal\vcard\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -21,14 +21,14 @@ class VCardSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['vcard_d8_port.settings'];
+    return ['vcard.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('vcard_d8_port.settings');
+    $config = $this->config('vcard.settings');
     if (!_vcard_init()) {
       drupal_set_message(t('The PEAR package Contact_Vcard_Build (required by vcard.module) has not been installed properly, please read INSTALL.txt.'), 'warning');
     }
@@ -79,9 +79,9 @@ class VCardSettingsForm extends ConfigFormBase {
    * Implments submit callback for vCard
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = \Drupal::service('config.factory')->getEditable('vcard_d8_port.settings');
+    $config = \Drupal::service('config.factory')->getEditable('vcard.settings');
     //Savng User Mapping Field
-    $user_fields = vcard_d8_port_get_user_fields();
+    $user_fields = vcard_get_user_fields();
     foreach ($user_fields as $key => $value) {
       $user_field_mapping = $form_state->getValue('vcard_user_fields_'.$key);
       $config->set('vcard_user_fields_'.$key, $user_field_mapping)->save();

@@ -11,11 +11,11 @@ use Drupal\Component\Utility\Html;
 /**
  * Implements hook_help
  */
-function vcard_d8_port_help($route_name, RouteMatchInterface $route_match) {
+function vcard_help($route_name, RouteMatchInterface $route_match) {
   $microformat = Link::fromTextAndUrl(t('microformat'), Url::fromUri
   ('http://microformats.org'))->toString();
 	switch ($route_name) {
-    case 'help.page.vcard_d8_port':
+    case 'help.page.vcard':
       $aggregation = Link::fromTextAndUrl(t('aggregation tools'), Url::fromUri
       ('https://addons.mozilla.org/en-US/firefox/addon/2240'))->toString();
       $hcard = Link::fromTextAndUrl(t('hcard'), Url::fromUri
@@ -51,7 +51,7 @@ function vcard_d8_port_help($route_name, RouteMatchInterface $route_match) {
       your profiles, see the @vcard_help and README', array('@microformats' => $microformat, '@vcard_help' => $vcard_help));
       return $output;
 
-    case 'vcard_d8_port.settings':
+    case 'vcard.settings':
       $profile_settngs_link = Link::fromTextAndUrl(t('the Profile Configuration page'), Url::fromUserInput('/admin/config/people/accounts/fields'))->toString();
       $output = t('Profile fields are added and administered on @profile_settings_link .', array('@profile_settings_link' => $profile_settngs_link));
       return $output;
@@ -97,7 +97,7 @@ function _vcard_properties() {
 /**
  * Implements hook_entity_extra_field_info().
  */
-function vcard_d8_port_entity_extra_field_info() {
+function vcard_entity_extra_field_info() {
   $extra = array();
   $extra['user']['user']['display']['vcard_download'] = array(
     'label' => t('Vcard Download'),
@@ -117,9 +117,9 @@ function vcard_d8_port_entity_extra_field_info() {
 /**
  * hook_ENTITY_TYPE_view
  */
-function vcard_d8_port_user_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+function vcard_user_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
   //$user_fields = get_user_fields_for_template($entity);
-  $config = \Drupal::config('vcard_d8_port.settings');
+  $config = \Drupal::config('vcard.settings');
   $user_id = $entity->id();
   $account = User::load($user_id);
 
@@ -135,10 +135,10 @@ function vcard_d8_port_user_view(array &$build, EntityInterface $entity, EntityV
     if ($display_hcard) {
       $build['hcard'] = [
         '#title' => 'hCard',
-        '#theme' => 'vcard_d8_port',
+        '#theme' => 'vcard',
         '#user' => $account,
         '#prefix' => '<h3 class="hcard">' . t('hCard') . '</h3>',
-        '#weight' => 5,
+        '#weight' => 99,
         '#attributes' => array('class' => 'vcard-hcard'),
       ];
     }
@@ -147,7 +147,7 @@ function vcard_d8_port_user_view(array &$build, EntityInterface $entity, EntityV
         '#title' => 'Download',
         '#prefix' => '<h3 class="vcard-download">' . t('Download') . '</h3>',
         '#markup' =>  Link::fromTextAndUrl(t('Download vcard'), Url::fromUserInput("/user/$user_id/vcard"))->toString(),
-        '#weight' => 10,
+        '#weight' => 100,
         '#attributes' => array('class' => 'vcard-link'),
       ];
     }
@@ -157,7 +157,7 @@ function vcard_d8_port_user_view(array &$build, EntityInterface $entity, EntityV
 /**
  * vCard get User field names
  */
-function vcard_d8_port_get_user_fields(){
+function vcard_get_user_fields(){
   $user = User::load(\Drupal::currentUser()->id());
   $user_fields = $user->getFieldDefinitions('user', 'user');
   foreach ($user_fields as $field_name => $field_definition) {
@@ -179,8 +179,8 @@ function vcard_get($user) {
   $name = $user->get('name')->value;
   $vcard = _vcard_init();
   $vcard->addParam('ENCODING', '8BIT');
-  $config = \Drupal::config('vcard_d8_port.settings');
-  $user_fields = vcard_d8_port_get_user_fields();
+  $config = \Drupal::config('vcard.settings');
+  $user_fields = vcard_get_user_fields();
   $picture=$user->get('user_picture')->entity;
 
   foreach ($user_fields as $key => $value) {
@@ -326,11 +326,11 @@ function _vcard_get_map($user) {
 /**
  * Implement hook_theme().
  */
-function vcard_d8_port_theme() {
+function vcard_theme() {
   return array(
-    'vcard_d8_port' => array(
+    'vcard' => array(
       'variables' => array('user' => NULL),
-      'template' => 'vcard-d8-port',
+      'template' => 'vcard',
     ),
   );
 }
@@ -344,13 +344,13 @@ function vcard_d8_port_theme() {
  *
  * @see vcard.tpl.php
  */
-function template_preprocess_vcard_d8_port(&$variables) {
+function template_preprocess_vcard(&$variables) {
   $user = $variables['user'];
 
   $vcard_raw = vcard_get_raw($user);
   $name = $user->get('name')->value;
-  $user_fields = vcard_d8_port_get_user_fields();
-  $config = \Drupal::config('vcard_d8_port.settings');
+  $user_fields = vcard_get_user_fields();
+  $config = \Drupal::config('vcard.settings');
   $picture = $user->get('user_picture')->entity;
 
   foreach ($user_fields as $key => $value) {

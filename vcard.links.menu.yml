@@ -1,5 +1,5 @@
-vcard_d8_port.admin_settings:
+vcard.admin_settings:
  title: 'vCard'
  description: 'Allows vcard export of user data.'
- route_name: vcard_d8_port.settings
+ route_name: vcard.settings
  parent: user.admin_index

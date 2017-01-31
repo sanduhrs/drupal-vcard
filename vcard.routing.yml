@@ -1,16 +1,16 @@
-vcard_d8_port.settings:
+vcard.settings:
  path: 'admin/config/media/vcard'
  defaults:
-  _form: '\Drupal\vcard_d8_port\Form\VCardSettingsForm'
+  _form: '\Drupal\vcard\Form\VCardSettingsForm'
   _title: 'vCard'
  requirements:
   _permission: 'administer vcard'
 
-vcard_d8_port.user_check:
+vcard.user_check:
  path: 'user/{user}/vcard'
  defaults:
   _title: 'Check User Details'
-  _controller: '\Drupal\vcard_d8_port\Controller\VCardD8PortController::vcardFetch'
+  _controller: '\Drupal\vcard\Controller\VCardController::vcardFetch'
  requirements:
   _permission: 'download vcard'
 

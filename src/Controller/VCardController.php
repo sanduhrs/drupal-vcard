@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\vcard_d8_port\Controller;
+namespace Drupal\vcard\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
 
-class VCardD8PortController extends ControllerBase {
+class VCardController extends ControllerBase {
   /**
    * VCard for direct download
    *
@@ -13,12 +13,12 @@ class VCardD8PortController extends ControllerBase {
    */
   public function vcardFetch(AccountInterface $user) {
     $vcard = vcard_get($user);
-    $vcard_text = $vcard->fetch();
+    $vcard_txt = $vcard->fetch();
 
     if (!empty($vcard_text)) {
       header('Content-type: text/x-vcard; charset=UTF-8');
       header('Content-Disposition: attachment; filename="' . uniqid() . '.vcf"');
-      print $vcard_text;
+      print $vcard_txt;
       exit;
     }
     else {
