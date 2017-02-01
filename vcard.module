@@ -4,12 +4,9 @@
  * @file
  * VCard is a file format standard for electronic business cards.
  *
- * vCards are often attached to e-mail messages, but can be exchanged in
+ * VCards are often attached to e-mail messages, but can be exchanged in
  * other ways, such as on the World Wide Web. (http://en.wikipedia
  * .org/wiki/Vcard)
- *
- * @author
- * Shabbir Reshamwala <shabbir_reshamwala@yahoo.com>
  */
 
 use Drupal\Core\Entity\EntityInterface;
