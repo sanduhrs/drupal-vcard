@@ -138,8 +138,7 @@ function vcard_user_view(array &$build, EntityInterface $entity, EntityViewDispl
   $user_id = $entity->id();
   $account = User::load($user_id);
 
-  if ($account->hasPermission('have vcard') && ($account->hasPermission
-      ('download vcard') || $account->hasPermission('download vcard with 
+  if ($account->hasPermission('have vcard') && ($account->hasPermission('download vcard') || $account->hasPermission('download vcard with 
       email')) && _vcard_init()) {
     $display_link = $config->get('vcard_display_profile_link', 1);
     $display_hcard = $config->get('vcard_display_profile_hcard', 1);
