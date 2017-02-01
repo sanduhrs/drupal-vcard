@@ -21,14 +21,12 @@ use Drupal\Component\Utility\Html;
  * Implements hook_help().
  */
 function vcard_help($route_name, RouteMatchInterface $route_match) {
-  $microformat = Link::fromTextAndUrl(t('microformat'), Url::fromUri
-  ('http://microformats.org'))->toString();
+  $microformat = Link::fromTextAndUrl(t('microformat'), Url::fromUri('http://microformats.org'))->toString();
   switch ($route_name) {
     case 'help.page.vcard':
       $aggregation = Link::fromTextAndUrl(t('aggregation tools'),
         Url::fromUri('https://addons.mozilla.org/en-US/firefox/addon/2240'))->toString();
-      $hcard = Link::fromTextAndUrl(t('hcard'), Url::fromUri
-      ('http://microformats.org/wiki/hcard'))->toString();
+      $hcard = Link::fromTextAndUrl(t('hcard'), Url::fromUri('http://microformats.org/wiki/hcard'))->toString();
 
       $output = '<p>' . t('vCard automates the exchange of personal
       information typically  found on a traditional business card. vCard is 
