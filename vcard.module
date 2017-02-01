@@ -131,15 +131,16 @@ function vcard_entity_extra_field_info() {
 }
 
 /**
- * hook_ENTITY_TYPE_view
+ * Hook_ENTITY_TYPE_view().
  */
 function vcard_user_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  //$user_fields = get_user_fields_for_template($entity);
   $config = \Drupal::config('vcard.settings');
   $user_id = $entity->id();
   $account = User::load($user_id);
 
-  if($account->hasPermission('have vcard') && ($account->hasPermission('download vcard') || $account->hasPermission('download vcard with email')) && _vcard_init()) {
+  if ($account->hasPermission('have vcard') && ($account->hasPermission
+      ('download vcard') || $account->hasPermission('download vcard with 
+      email')) && _vcard_init()) {
     $display_link = $config->get('vcard_display_profile_link', 1);
     $display_hcard = $config->get('vcard_display_profile_hcard', 1);
     if ($display_link || $display_hcard) {
@@ -162,7 +163,7 @@ function vcard_user_view(array &$build, EntityInterface $entity, EntityViewDispl
       $build['vcard_download'] = [
         '#title' => 'Download',
         '#prefix' => '<h3 class="vcard-download">' . t('Download') . '</h3>',
-        '#markup' =>  Link::fromTextAndUrl(t('Download vcard'), Url::fromUserInput("/user/$user_id/vcard"))->toString(),
+        '#markup' => Link::fromTextAndUrl(t('Download vcard'), Url::fromUserInput("/user/$user_id/vcard"))->toString(),
         '#weight' => 100,
         '#attributes' => array('class' => 'vcard-link'),
       ];
