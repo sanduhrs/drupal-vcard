@@ -53,13 +53,13 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
         Url::fromUserInput('/admin/config/media/vcard'))->toString();
       $vcard_help = Link::fromTextAndUrl(t('vCard help'), Url::fromUserInput('/admin/help/vcard'))->toString();
 
-      $output = '<p>'. t('For assistance setting up a default profile with 
+      $output = '<p>' . t('For assistance setting up a default profile with 
       common fields, visit @vcard_settings which can map vCard fields with 
       your custom profile fields.', array('@vcard_settings' => $vcard_settings)) . '</p>';
       $output .= '<p>' .  t('To enable machine-readable @microformats for 
       your profiles, see the @vcard_help and README', array(
-      '@microformats' => $microformat,
-      '@vcard_help' => $vcard_help,
+        '@microformats' => $microformat,
+        '@vcard_help' => $vcard_help,
       ));
       return $output;
 
@@ -68,17 +68,17 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       Configuration page'), Url::fromUserInput('/admin/config/people/accounts/fields'))->toString();
       $output = t('Profile fields are added and administered on 
       @profile_settings_link .', array(
-      '@profile_settings_link' => $profile_settngs_link,
+        '@profile_settings_link' => $profile_settngs_link,
       ));
       return $output;
   }
 }
 
 /**
- * Ensures the vcard PEAR library is available and returns the vCard builder
- * object.
+ * Ensures the vcard PEAR library is available and returns vCard builder object.
  *
- * @return vCard object, null if library is not available.
+ * @return vCard
+ * Returns vCard object, null if library is not available.
  */
 function _vcard_init() {
   if (@include_once('File/IMC.php')) {
