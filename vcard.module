@@ -42,7 +42,7 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       the page using @hcard - an embedded @microformat', array(
         '@aggregation' => $aggregation,
         '@hcard' => $hcard,
-        '@microformat' => $microformat
+        '@microformat' => $microformat,
         )) . '</p>';
 
       $output .= '<p>' . t("Read the module's documentation for more information on how to add hCard support to your theme.") . '</p>';
@@ -51,19 +51,25 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
     case 'entity.user.field_ui_fields':
       $vcard_settings = Link::fromTextAndUrl(t('the VCard settings'),
         Url::fromUserInput('/admin/config/media/vcard'))->toString();
-      $vcard_help = Link::fromTextAndUrl(t('vCard help'), Url::fromUserInput
-      ('/admin/help/vcard'))->toString();
+      $vcard_help = Link::fromTextAndUrl(t('vCard help'), Url::fromUserInput('/admin/help/vcard'))->toString();
 
       $output = '<p>'. t('For assistance setting up a default profile with 
       common fields, visit @vcard_settings which can map vCard fields with 
       your custom profile fields.', array('@vcard_settings' => $vcard_settings)) . '</p>';
       $output .= '<p>' .  t('To enable machine-readable @microformats for 
-      your profiles, see the @vcard_help and README', array('@microformats' => $microformat, '@vcard_help' => $vcard_help));
+      your profiles, see the @vcard_help and README', array(
+        '@microformats' => $microformat,
+        '@vcard_help' => $vcard_help,
+        ));
       return $output;
 
     case 'vcard.settings':
-      $profile_settngs_link = Link::fromTextAndUrl(t('the Profile Configuration page'), Url::fromUserInput('/admin/config/people/accounts/fields'))->toString();
-      $output = t('Profile fields are added and administered on @profile_settings_link .', array('@profile_settings_link' => $profile_settngs_link));
+      $profile_settngs_link = Link::fromTextAndUrl(t('the Profile 
+      Configuration page'), Url::fromUserInput('/admin/config/people/accounts/fields'))->toString();
+      $output = t('Profile fields are added and administered on 
+      @profile_settings_link .', array(
+        '@profile_settings_link' => $profile_settngs_link,
+      ));
       return $output;
   }
 }
