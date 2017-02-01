@@ -6,13 +6,13 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Class VCardController
- * @package Drupal\vcard\Controller
+ * Class VCardController.
+ * @package Drupal\vcard\Controller.
+ *
  */
 class VCardController extends ControllerBase {
   /**
    * VCard for direct download.
-   *
    * Prints to the browser for direct download, then exits.
    */
 
@@ -30,5 +30,5 @@ class VCardController extends ControllerBase {
       return $this->t("Error building vcard");
     }
   }
-  
+
 }
