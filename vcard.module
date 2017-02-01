@@ -40,10 +40,10 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       $output .= '<p>' . t('Web browsers and @aggregation  
       can also extract and use vCard-like information when it is displayed on
       the page using @hcard - an embedded @microformat', array(
-        '@aggregation' => $aggregation,
-        '@hcard' => $hcard,
-        '@microformat' => $microformat,
-        )) . '</p>';
+      '@aggregation' => $aggregation,
+      '@hcard' => $hcard,
+      '@microformat' => $microformat,
+      )) . '</p>';
 
       $output .= '<p>' . t("Read the module's documentation for more information on how to add hCard support to your theme.") . '</p>';
       return $output;
@@ -58,9 +58,9 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       your custom profile fields.', array('@vcard_settings' => $vcard_settings)) . '</p>';
       $output .= '<p>' .  t('To enable machine-readable @microformats for 
       your profiles, see the @vcard_help and README', array(
-        '@microformats' => $microformat,
-        '@vcard_help' => $vcard_help,
-        ));
+      '@microformats' => $microformat,
+      '@vcard_help' => $vcard_help,
+      ));
       return $output;
 
     case 'vcard.settings':
@@ -68,7 +68,7 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       Configuration page'), Url::fromUserInput('/admin/config/people/accounts/fields'))->toString();
       $output = t('Profile fields are added and administered on 
       @profile_settings_link .', array(
-        '@profile_settings_link' => $profile_settngs_link,
+      '@profile_settings_link' => $profile_settngs_link,
       ));
       return $output;
   }
