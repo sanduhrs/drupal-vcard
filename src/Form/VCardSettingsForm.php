@@ -78,15 +78,14 @@ class VCardSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
-   * Implments submit callback for vCard.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this::service('config.factory')->getEditable('vcard.settings');
     // Savng User Mapping Field.
     $user_fields = vcard_get_user_fields();
     foreach ($user_fields as $key => $value) {
-      $user_field_mapping = $form_state->getValue('vcard_user_fields_'.$key);
-      $config->set('vcard_user_fields_'.$key, $user_field_mapping)->save();
+      $user_field_mapping = $form_state->getValue('vcard_user_fields_' . $key);
+      $config->set('vcard_user_fields_' . $key, $user_field_mapping)->save();
     }
     // Savng Display settings for vCard.
     $display_settings_vcard = $form_state->getValue('vcard_display_profile_link');
