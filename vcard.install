@@ -1,15 +1,19 @@
 <?php
 
+/**
+ * @file
+ * Checks if VCard library is installed on the server before proceeding.
+ */
+
 use Drupal\Core\Url;
 use Drupal\Core\Link;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Implements hook_requirements().
  */
 function vcard_requirements($phase) {
   $requirement = array();
-  require_once(dirname(__FILE__) . '/vcard.module');
+  require_once dirname(__FILE__) . '/vcard.module';
   $init = _vcard_init();
   if ($phase === 'runtime') {
     $link1 = Link::fromTextAndUrl('PEAR File_IMC', Url::fromUri('http://pear.php.net/package/File_IMC'));
