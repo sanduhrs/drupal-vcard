@@ -202,34 +202,39 @@ function vcard_get($user) {
   foreach ($user_fields as $key => $value) {
     $config_key = $config->get('vcard_user_fields_' . $key);
     // Firstname.
-    if ($config_key == 'givenname') {
+    if ($config->get('vcard_user_fields_' . $key, '') == 'givenname') {
       $givenname = $vcard_raw->$key;
     }
     // Lastname.
-    if ($config_key == 'familyname')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'familyname') {
       $familyname = $vcard_raw->$key;
+    }
     // Birthday.
-    if ($config_key == 'birthday')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'birthday') {
       $birthday = $vcard_raw->$key;
+    }
     // Telephone.
-    if ($config_key == 'telephone')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'telephone') {
       $telephone = $vcard_raw->$key;
+    }
     // Organization.
-    if ($config_key == 'organization')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'organization') {
       $organization = $vcard_raw->$key;
+    }
     // URL.
-    if ($config_key == 'url')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'url') {
       $url = $vcard_raw->$key;
+    }
     // Address.
-    $street = $config_key == 'street' ?
+    $street = $config->get('vcard_user_fields_' . $key, '') == 'street' ?
       $vcard_raw->$key : '';
-    $city = $config_key == 'city' ?
+    $city = $config->get('vcard_user_fields_' . $key, '') == 'city' ?
       $vcard_raw->$key : '';
-    $province = $config_key == 'province'
+    $province = $config->get('vcard_user_fields_' . $key, '') == 'province'
       ? $vcard_raw->$key : '';
-    $postal = $config_key == 'postal' ?
+    $postal = $config->get('vcard_user_fields_' . $key, '') == 'postal' ?
       $vcard_raw->$key : '';
-    $country = $config_key == 'country' ?
+    $country = $config->get('vcard_user_fields_' . $key, '') == 'country' ?
       $vcard_raw->$key : '';
   }
 
@@ -378,23 +383,29 @@ function template_preprocess_vcard(&$variables) {
 
   foreach ($user_fields as $key => $value) {
     // Firstname.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'givenname')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'givenname') {
       $givenname = $vcard_raw->$key;
+    }
     // Lastname.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'familyname')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'familyname') {
       $familyname = $vcard_raw->$key;
+    }
     // Birthday.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'birthday')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'birthday') {
       $birthday = $vcard_raw->$key;
+    }
     // Telephone.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'telephone')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'telephone') {
       $telephone = $vcard_raw->$key;
+    }
     // Organization.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'organization')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'organization') {
       $organization = $vcard_raw->$key;
+    }
     // URL.
-    if ($config->get('vcard_user_fields_' . $key, '') == 'url')
+    if ($config->get('vcard_user_fields_' . $key, '') == 'url') {
       $url = $vcard_raw->$key;
+    }
   }
 
   // Picture.
