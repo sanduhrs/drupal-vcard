@@ -42,9 +42,10 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       the page using @hcard - an embedded @microformat', array(
         '@aggregation' => $aggregation,
         '@hcard' => $hcard,
-        '@microformat' => $microformat)) . '</p>';
+        '@microformat' => $microformat
+        )) . '</p>';
 
-      $output .= '<p>' . t('Read the module\'s documentation for more information on how to add hCard support to your theme.') . '</p>';
+      $output .= '<p>' . t("Read the module's documentation for more information on how to add hCard support to your theme.") . '</p>';
       return $output;
 
     case 'entity.user.field_ui_fields':
