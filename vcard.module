@@ -401,9 +401,9 @@ function template_preprocess_vcard(&$variables) {
     $variables['user_image'] = $picture->url();
   }
   $variables['user'] = $user;
-  $variables['vcard']   = $vcard_raw;
-  $variables['givenname']   = $givenname;
-  $variables['familyname']   = $familyname;
+  $variables['vcard'] = $vcard_raw;
+  $variables['givenname'] = $givenname;
+  $variables['familyname'] = $familyname;
   $variables['name'] = $name;
   $variables['email'] = $user->get('mail')->value;
   $variables['birthday'] = $birthday;
