@@ -200,7 +200,7 @@ function vcard_get($user) {
   $picture = $user->get('user_picture')->entity;
 
   foreach ($user_fields as $key => $value) {
-    $config_key = $config->get('vcard_user_fields_' . $key, '');
+    $config_key = $config->get('vcard_user_fields_' . $key);
     // Firstname.
     if ($config_key == 'givenname')
       $givenname = $vcard_raw->$key;
