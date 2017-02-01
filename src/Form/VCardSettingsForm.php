@@ -13,6 +13,7 @@ class VCardSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+
   public function getFormId() {
     return 'vcard_admin_settings_form';
   }
