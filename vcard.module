@@ -40,9 +40,9 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       $output .= '<p>' . t('Web browsers and @aggregation  
       can also extract and use vCard-like information when it is displayed on
       the page using @hcard - an embedded @microformat', array(
-      '@aggregation' => $aggregation,
-      '@hcard' => $hcard,
-      '@microformat' => $microformat,
+        '@aggregation' => $aggregation,
+        '@hcard' => $hcard,
+        '@microformat' => $microformat,
       )) . '</p>';
 
       $output .= '<p>' . t("Read the module's documentation for more information on how to add hCard support to your theme.") . '</p>';
