@@ -9,12 +9,11 @@ use Drupal\Core\Session\AccountInterface;
  * Class VCardController.
  *
  * @package Drupal\vcard\Controller.
- *
  */
 class VCardController extends ControllerBase {
 
   /**
-   * VCard for direct download. Prints to the browser for direct download, then exits.
+   * VCard for direct download. Prints to the browser for direct download.
    */
   public function vcardFetch(AccountInterface $user) {
     $vcard = vcard_get($user);
