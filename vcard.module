@@ -202,7 +202,7 @@ function vcard_get($user) {
   foreach ($user_fields as $key => $value) {
     $config_key = $config->get('vcard_user_fields_' . $key);
     // Firstname.
-    if ($config_key == 'givenname')
+    if ($config_key === 'givenname')
       $givenname = $vcard_raw->$key;
     // Lastname.
     if ($config_key == 'familyname')
