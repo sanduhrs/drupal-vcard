@@ -302,7 +302,7 @@ function vcard_get($user) {
 }
 
 /**
- * Return one vCard property
+ * Return one vCard property.
  */
 function vcard_get_raw_field($field, $user) {
   $vcard_raw = vcard_get_raw($user);
@@ -310,13 +310,13 @@ function vcard_get_raw_field($field, $user) {
 }
 
 /**
- * Assemble a raw vcard data structure
+ * Assemble a raw vcard data structure.
  */
 function vcard_get_raw($user) {
   static $vcard_raw = array();
   if (empty($vcard_raw[$user->id()])) {
     $vcard_raw[$user->id()] = (object) _vcard_get_map($user);
-    $picture=$user->get('user_picture')->entity;
+    $picture = $user->get('user_picture')->entity;
     if ($picture != '') {
       $vcard_raw[$user->id()]->picture = $picture->url();
     }
@@ -326,13 +326,13 @@ function vcard_get_raw($user) {
     }
   }
 
-  // Allow to alter the values
+  // Allow to alter the values.
   \Drupal::moduleHandler()->alter('vcard_data', $vcard_raw[$user->id()]);
   return $vcard_raw[$user->id()];
 }
 
 /**
- * Returns an array of profilefield-to-vcard attribute fieldnames
+ * Returns an array of profilefield-to-vcard attribute fieldnames.
  */
 function _vcard_get_map($user) {
   $account = User::load($user->id());
@@ -346,7 +346,7 @@ function _vcard_get_map($user) {
 }
 
 /**
- * Implement hook_theme().
+ * Implements hook_theme().
  */
 function vcard_theme() {
   return array(
@@ -376,29 +376,28 @@ function template_preprocess_vcard(&$variables) {
   $picture = $user->get('user_picture')->entity;
 
   foreach ($user_fields as $key => $value) {
-    // Firstname
+    // Firstname.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'givenname')
       $givenname = $vcard_raw->$key;
-    // Lastname
+    // Lastname.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'familyname')
       $familyname = $vcard_raw->$key;
-    // Birthday
+    // Birthday.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'birthday')
       $birthday = $vcard_raw->$key;
-    // Telephone
+    // Telephone.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'telephone')
       $telephone = $vcard_raw->$key;
-    // Organization
+    // Organization.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'organization')
       $organization = $vcard_raw->$key;
-    // URL
+    // URL.
     if ($config->get('vcard_user_fields_'. $key, '')  == 'url')
       $url = $vcard_raw->$key;
   }
 
-  //Picture
+  // Picture.
   if ($picture != '') {
-    //$filepath = Drupal\image\Entity\ImageStyleImageStyle::load('medium')->buildUri($picture->getFileUri());
     $variables['user_image'] = $picture->url();
   }
   $variables['user'] = $user;
