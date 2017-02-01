@@ -171,13 +171,12 @@ function vcard_user_view(array &$build, EntityInterface $entity, EntityViewDispl
 }
 
 /**
- * vCard get User field names
+ * VCard get User field names.
  */
-function vcard_get_user_fields(){
+function vcard_get_user_fields() {
   $user = User::load(\Drupal::currentUser()->id());
   $user_fields = $user->getFieldDefinitions('user', 'user');
   foreach ($user_fields as $field_name => $field_definition) {
-    //if (!empty($field_definition->getTargetBundle())) {
     if ($field_definition->getFieldStorageDefinition()->isBaseField() == FALSE) {
       $options[$field_name] = $field_definition->getLabel();
     }
@@ -186,9 +185,10 @@ function vcard_get_user_fields(){
 }
 
 /**
- * Retrieve a user's vcard
+ * Retrieve a user's vcard.
  *
- * @return  a vcard object structure with formatted values in the fields
+ * @return vcard
+ *   Returns a vcard object structure with formatted values in the fields.
  */
 function vcard_get($user) {
   $vcard_raw = vcard_get_raw($user);
@@ -197,36 +197,41 @@ function vcard_get($user) {
   $vcard->addParam('ENCODING', '8BIT');
   $config = \Drupal::config('vcard.settings');
   $user_fields = vcard_get_user_fields();
-  $picture=$user->get('user_picture')->entity;
+  $picture = $user->get('user_picture')->entity;
 
   foreach ($user_fields as $key => $value) {
-    // Firstname
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'givenname')
+    // Firstname.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'givenname')
       $givenname = $vcard_raw->$key;
-    // Lastname
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'familyname')
+    // Lastname.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'familyname')
       $familyname = $vcard_raw->$key;
-    // Birthday
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'birthday')
+    // Birthday.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'birthday')
       $birthday = $vcard_raw->$key;
-    // Telephone
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'telephone')
+    // Telephone.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'telephone')
       $telephone = $vcard_raw->$key;
-    // Organization
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'organization')
+    // Organization.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'organization')
       $organization = $vcard_raw->$key;
-    // URL
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'url')
+    // URL.
+    if ($config->get('vcard_user_fields_' . $key, '')  == 'url')
       $url = $vcard_raw->$key;
-    // Address
-    $street = $config->get('vcard_user_fields_'. $key, '')  == 'street' ? $vcard_raw->$key : '';
-    $city = $config->get('vcard_user_fields_'. $key, '')  == 'city' ? $vcard_raw->$key : '';
-    $province = $config->get('vcard_user_fields_'. $key, '')  == 'province' ? $vcard_raw->$key : '';
-    $postal = $config->get('vcard_user_fields_'. $key, '')  == 'postal' ? $vcard_raw->$key : '';
-    $country = $config->get('vcard_user_fields_'. $key, '')  == 'country' ? $vcard_raw->$key : '';
+    // Address.
+    $street = $config->get('vcard_user_fields_' . $key, '')  == 'street' ?
+      $vcard_raw->$key : '';
+    $city = $config->get('vcard_user_fields_' . $key, '')  == 'city' ?
+      $vcard_raw->$key : '';
+    $province = $config->get('vcard_user_fields_' . $key, '')  == 'province'
+      ? $vcard_raw->$key : '';
+    $postal = $config->get('vcard_user_fields_' . $key, '')  == 'postal' ?
+      $vcard_raw->$key : '';
+    $country = $config->get('vcard_user_fields_' . $key, '')  == 'country' ?
+      $vcard_raw->$key : '';
   }
 
-  //Picture
+  // Picture.
   if ($picture != '') {
     $user_picture = $picture->url();
     $vcard->setPhoto($user_picture);
@@ -234,8 +239,8 @@ function vcard_get($user) {
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  //Combining Firstname and Lastname
-  if(isset($givenname) && isset($familyname)) {
+  // Combining Firstname and Lastname.
+  if (isset($givenname) && isset($familyname)) {
     $vcard->setName($familyname, $givenname, '', '', '');
     $vcard->addParam('ENCODING', '8BIT');
     $vcard->setFormattedName($givenname . ' ' . $familyname);
@@ -248,18 +253,18 @@ function vcard_get($user) {
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  // Email
-  if(!empty($user->get('mail'))) {
+  // Email.
+  if (!empty($user->get('mail'))) {
     $mail = $user->get('mail')->value;
     $vcard->addEmail(HTML::escape($mail));
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  // Nickname
+  // Nickname.
   $vcard->addNickname(HTML::escape($name));
   $vcard->addParam('ENCODING', '8BIT');
 
-  // Birthday
+  // Birthday.
   if (isset($birthday)) {
     if (is_array($birthday)) {
       $bday = $birthday['year'] . '-' . $birthday['month'] . '-' . $birthday['day'];
@@ -270,23 +275,23 @@ function vcard_get($user) {
     }
     $vcard->addParam('ENCODING', '8BIT');
   }
-  // Address
+  // Address.
   if (isset($street) || isset($city) || isset($province) || isset($postal) || isset($country)) {
     $vcard->addAddress($street, $city, $province, $postal, $country);
     $vcard->addParam('ENCODING', '8BIT');
   }
-  // Telephone
+  // Telephone.
   if (isset($telephone)) {
     $vcard->addTelephone($telephone);
     $vcard->addParam('ENCODING', '8BIT');
   }
 
-  // Organization
+  // Organization.
   if (isset($organization)) {
     $vcard->addOrganization($organization);
     $vcard->addParam('ENCODING', '8BIT');
   }
-  // URL
+  // URL.
   if (isset($url)) {
     $vcard->setURL($url);
     $vcard->addParam('ENCODING', '8BIT');
