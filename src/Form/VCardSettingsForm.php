@@ -10,10 +10,10 @@ use Drupal\user\Entity\User;
  * Configure download count settings.
  */
 class VCardSettingsForm extends ConfigFormBase {
+
   /**
    * {@inheritdoc}
    */
-
   public function getFormId() {
     return 'vcard_admin_settings_form';
   }
