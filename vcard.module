@@ -56,7 +56,7 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
       $output = '<p>' . t('For assistance setting up a default profile with 
       common fields, visit @vcard_settings which can map vCard fields with 
       your custom profile fields.', array('@vcard_settings' => $vcard_settings)) . '</p>';
-      $output .= '<p>' .  t('To enable machine-readable @microformats for 
+      $output .= '<p>' . t('To enable machine-readable @microformats for 
       your profiles, see the @vcard_help and README', array(
         '@microformats' => $microformat,
         '@vcard_help' => $vcard_help,
@@ -78,13 +78,13 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
  * Ensures the vcard PEAR library is available and returns vCard builder object.
  *
  * @return vCard
- * Returns vCard object, null if library is not available.
+ *   Returns vCard object, null if library is not available.
  */
 function _vcard_init() {
-  if (@include_once('File/IMC.php')) {
+  if (@include_once 'File/IMC.php') {
     $vcard =& File_IMC::build('vCard', '3.0');
   }
-  elseif (@include_once('Contact_Vcard_Build.php')) {
+  elseif (@include_once 'Contact_Vcard_Build.php') {
     $vcard = new Contact_Vcard_Build();
   }
   return empty($vcard) ? FALSE : $vcard;
