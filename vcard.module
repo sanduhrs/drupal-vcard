@@ -377,22 +377,22 @@ function template_preprocess_vcard(&$variables) {
 
   foreach ($user_fields as $key => $value) {
     // Firstname.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'givenname')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'givenname')
       $givenname = $vcard_raw->$key;
     // Lastname.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'familyname')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'familyname')
       $familyname = $vcard_raw->$key;
     // Birthday.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'birthday')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'birthday')
       $birthday = $vcard_raw->$key;
     // Telephone.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'telephone')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'telephone')
       $telephone = $vcard_raw->$key;
     // Organization.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'organization')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'organization')
       $organization = $vcard_raw->$key;
     // URL.
-    if ($config->get('vcard_user_fields_'. $key, '')  == 'url')
+    if ($config->get('vcard_user_fields_'. $key, '') == 'url')
       $url = $vcard_raw->$key;
   }
 
