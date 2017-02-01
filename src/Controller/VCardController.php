@@ -19,11 +19,11 @@ class VCardController extends ControllerBase {
     if (!empty($vcard_text)) {
       header('Content-type: text/x-vcard; charset=UTF-8');
       header('Content-Disposition: attachment; filename="' . uniqid() . '.vcf"');
-      print $vcard_te	xt;
+      print $vcard_text;
       exit;
     }
     else {
-      return t("Error building vcard");
+      return $this->t("Error building vcard");
     }
   }
   
