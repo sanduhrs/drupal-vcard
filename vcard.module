@@ -91,7 +91,7 @@ function _vcard_init() {
 }
 
 /**
- *
+ * Pre Defined field values to be mapped for vCard.
  */
 function _vcard_properties() {
   return array(
