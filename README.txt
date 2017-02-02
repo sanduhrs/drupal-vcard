@@ -1,5 +1,3 @@
-// $Id: INSTALL.txt,v 1.0 2017/2/2 15:22:59
-
 Installation instructions for vcard module:
 
 1) Install Contact_Vcard_Build from PEAR:
