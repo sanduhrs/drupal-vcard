@@ -77,12 +77,12 @@ function vcard_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Ensures the vcard PEAR library is available and returns vCard builder object.
  *
- * @return vCard
+ * @return FALSE|vCard
  *   Returns vCard object, null if library is not available.
  */
 function _vcard_init() {
   if (@include_once 'File/IMC.php') {
-    $vcard =& File_IMC::build('vCard', '3.0');
+    $vcard = File_IMC::build('vCard', '3.0');
   }
   elseif (@include_once 'Contact_Vcard_Build.php') {
     $vcard = new Contact_Vcard_Build();
