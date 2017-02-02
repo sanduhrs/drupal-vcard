@@ -1,4 +1,4 @@
-// $Id: INSTALL.txt,v 1.6.2.1 2011/01/10 14:34:59 sanduhrs Exp $
+// $Id: INSTALL.txt,v 1.0 2017/2/2 15:22:59
 
 Installation instructions for vcard module:
 
