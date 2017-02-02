@@ -41,12 +41,12 @@ class VCardSettingsForm extends ConfigFormBase {
     $form['display']['vcard_display_profile_link'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Show vCard download link on user's profile"),
-      '#default_value' => $config->get('vcard_display_profile_link', 1),
+      '#default_value' => $config->get('vcard_display_profile_link'),
     );
     $form['display']['vcard_display_profile_hcard'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t("Show hCard on user's profile"),
-      '#default_value' => $config->get('vcard_display_profile_hcard', 1),
+      '#default_value' => $config->get('vcard_display_profile_hcard'),
     );
 
     $user = User::load($this::currentUser()->id());
@@ -62,14 +62,12 @@ class VCardSettingsForm extends ConfigFormBase {
 
     foreach ($user_fields as $field_name => $field_definition) {
       if ($field_definition->getFieldStorageDefinition()->isBaseField() == FALSE) {
-        $form['field_mappings']['vcard_user_fields_' . $field_name] =
-          array(
-            '#type' => 'select',
-            '#title' => $field_definition->getLabel(),
-            '#default_value' => $config->get('vcard_user_fields_' .
-              $field_name, ''),
-            '#options' => $options,
-          );
+        $form['field_mappings']['vcard_user_fields_' . $field_name] = array(
+          '#type' => 'select',
+          '#title' => $field_definition->getLabel(),
+          '#default_value' => $config->get('vcard_user_fields_' . $field_name),
+          '#options' => $options,
+        );
       }
     }
 
@@ -80,7 +78,7 @@ class VCardSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this::service('config.factory')->getEditable('vcard.settings');
+    $config = \Drupal::service('config.factory')->getEditable('vcard.settings');
     // Savng User Mapping Field.
     $user_fields = vcard_get_user_fields();
     foreach ($user_fields as $key => $value) {
